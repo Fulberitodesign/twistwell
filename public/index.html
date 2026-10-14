@@ -1,0 +1,1524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Twistwell writes stories and novels with a strong hook, real characters, cliffhangers and a fair twist, then lays them out like a real book with a cover.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F5F5B'/%3E%3Cpath d='M9 7h11a3 3 0 0 1 3 3v15H12a3 3 0 0 1-3-3z' fill='%23F1E3BF'/%3E%3Cpath d='M12 11h8M12 15h8M12 19h5' stroke='%239C711A' stroke-width='1.6'/%3E%3C/svg%3E">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
+#accessBar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding:10px 16px;background:#F1E3BF;color:#1C2321;font:14px system-ui,sans-serif}
+#accessBar input{padding:6px 8px;border:1px solid #9C711A;border-radius:6px}#accessBar button{padding:6px 12px;border-radius:6px;border:0;background:#1F5F5B;color:#fff;cursor:pointer}</style>
+<script src="shim.js"></script>
+<title>Twistwell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=IBM+Plex+Mono:wght@400;500&family=Playfair+Display:wght@700&family=Oswald:wght@600&family=Cormorant+Garamond:wght@600&family=Archivo+Black&family=Libre+Baskerville:wght@700&display=swap">
+<style>
+/* Layout: a writer's desk. Settings and history on the left, a typeset book on the right (cover, title page, contents, chapters) that fills as it's written. */
+:root{
+  --bg:#EEF0EC; --panel:#F8F9F6; --ink:#1C2321; --muted:#5B6662; --line:#D2D8D1;
+  --accent:#1F5F5B; --accent-ink:#F4F8F6; --brass:#9C711A; --brass-soft:#F1E3BF; --flag:#F6D9C9; --flag-ink:#7A2E12;
+  --display:"Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --prose:"Literata", Georgia, "Times New Roman", serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#131918; --panel:#1A2220; --ink:#E3E9E5; --muted:#97A39E; --line:#2C3734;
+  --accent:#74BCB3; --accent-ink:#0F1715; --brass:#E2B655; --brass-soft:#3A3120; --flag:#4A2A1E; --flag-ink:#F7C7B0; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131918; --panel:#1A2220; --ink:#E3E9E5; --muted:#97A39E; --line:#2C3734;
+  --accent:#74BCB3; --accent-ink:#0F1715; --brass:#E2B655; --brass-soft:#3A3120; --flag:#4A2A1E; --flag-ink:#F7C7B0; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--display);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1220px;margin:0 auto;display:grid;grid-template-columns:360px minmax(0,1fr);gap:28px;align-items:start}
+@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+
+header.brand{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;border-bottom:1px solid var(--line);padding-bottom:14px}
+.brand h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:0}
+.brand h1 span{color:var(--brass)}
+.brand p{margin:0;color:var(--muted);font-size:14px;max-width:62ch}
+
+.label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+aside{display:flex;flex-direction:column;gap:22px;min-width:0}
+.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 4px;font:inherit;font-size:15px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs .count{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:4px}
+form{display:flex;flex-direction:column;gap:16px}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+fieldset+fieldset{border-top:1px solid var(--line);padding-top:16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.row3{display:grid;grid-template-columns:.8fr 1fr 1.2fr;gap:10px}
+select,textarea,input[type=number],input[type=search]{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+input[type=number]{font-variant-numeric:tabular-nums}
+input#words{background:var(--brass-soft);border-color:var(--brass)}
+textarea{resize:vertical;min-height:84px;font-family:var(--prose);font-size:14px;line-height:1.5}
+select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-visible,summary:focus-visible,.seg input:focus-visible+span,label.upload:focus-within{outline:2px solid var(--accent);outline-offset:2px}
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;margin:0}
+.seg span{display:block;text-align:center;padding:8px 6px;font-size:14px;cursor:pointer;background:var(--panel)}
+.seg span small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+.seg input:checked+span{background:var(--ink);color:var(--bg)}
+.seg input:checked+span small{color:var(--bg);opacity:.75}
+.presets{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.presets .label{margin-right:2px}
+.pill{font-family:var(--mono);font-size:11px;padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
+.pill:hover{color:var(--ink);border-color:var(--muted)}
+.pill[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.calc{font-size:13px;color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+.calc.warn{color:var(--flag-ink)}
+.premise-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.premise-head .links{display:flex;gap:12px}
+.link{background:none;border:0;padding:0;font:inherit;font-size:13px;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link:disabled{opacity:.5;cursor:not-allowed}
+.ideas{display:flex;flex-direction:column;gap:6px}
+.ideas button{text-align:left;font-family:var(--prose);font-size:13.5px;line-height:1.45;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer}
+.ideas button:hover{border-color:var(--accent)}
+.actions{display:flex;gap:10px}
+.btn{font:inherit;font-size:15px;font-weight:500;border-radius:6px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.small{font-size:13px;padding:6px 11px}
+.note{font-size:13px;color:var(--muted);margin:0}
+
+/* history */
+.history{display:flex;flex-direction:column;gap:12px}
+.hfilters{display:flex;flex-wrap:wrap;gap:6px}
+.hlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.hlist li{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 6px;border-radius:6px}
+.hlist li.active,.hlist li:hover{background:var(--panel)}
+.hlist .sw{width:38px;height:57px;border-radius:2px 4px 4px 2px;display:flex;align-items:center;justify-content:center;font-family:var(--prose);font-weight:600;font-size:18px;box-shadow:0 1px 3px rgba(0,0,0,.25);overflow:hidden;background-size:cover;background-position:center}
+.hlist button.open{min-width:0;text-align:left;background:none;border:0;padding:0;cursor:pointer;font:inherit;color:var(--ink);display:flex;flex-direction:column;gap:2px}
+.hlist .t{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hlist .m{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.hlist .st{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:999px;align-self:flex-start}
+.hlist .st.done{background:var(--accent);color:var(--accent-ink)}
+.hlist .st.wip{background:var(--brass-soft);color:var(--brass)}
+.hlist button.del{background:none;border:0;color:var(--muted);cursor:pointer;font-size:12px;padding:4px 6px;font-family:var(--mono)}
+.hempty{font-family:var(--prose);font-style:italic;color:var(--muted);font-size:14px;margin:8px 0}
+
+main.page{background:var(--panel);border:1px solid var(--line);border-radius:4px;min-width:0;padding:clamp(20px,5vw,56px) clamp(18px,6vw,80px) 56px}
+.statusbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--panel);margin:calc(-1 * clamp(20px,5vw,56px)) 0 24px;padding-top:clamp(14px,3vw,24px);padding-bottom:12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.status{display:flex;align-items:center;gap:10px;min-height:22px}
+.status .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.status.busy .dot{background:var(--brass);animation:pulse 1.2s ease-in-out infinite}
+.status.err .dot{background:var(--flag-ink)}
+.status.err #statusText{color:var(--flag-ink)}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.status.busy .dot{animation:none}}
+.bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar span{display:block;height:100%;width:0;background:var(--brass);transition:width .4s}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tools .flags{font-size:13px;color:var(--muted);margin-left:auto}
+.tools .flags b{color:var(--flag-ink);background:var(--flag);padding:0 5px;border-radius:3px;font-weight:500}
+
+/* the book */
+.book{max-width:66ch;margin:0 auto}
+.titlepage{text-align:center;padding:clamp(8px,3vw,24px) 0 clamp(24px,5vw,40px);display:flex;flex-direction:column;align-items:center;gap:14px;margin-bottom:24px}
+.cover{display:flex;flex-direction:column;align-items:center;gap:10px;margin-bottom:10px}
+.cover canvas,.cover .ph{width:min(250px,64vw);aspect-ratio:2/3;max-width:100%;border-radius:2px 5px 5px 2px;box-shadow:0 1px 2px rgba(0,0,0,.2),0 14px 30px -12px rgba(0,0,0,.45)}
+.cover .ph{display:flex;align-items:center;justify-content:center;padding:20px;border:1px dashed var(--brass);background:var(--brass-soft);color:var(--muted);font-family:var(--prose);font-style:italic;font-size:14px;box-shadow:none;text-align:center}
+.titlepage .kind{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
+.titlepage h2{font-family:var(--prose);font-weight:600;font-size:clamp(32px,6vw,56px);line-height:1.04;letter-spacing:-.015em;margin:0;text-wrap:balance}
+.titlepage .logline{font-family:var(--prose);font-style:italic;font-size:18px;color:var(--muted);margin:0;max-width:46ch;text-wrap:balance}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.chip{font-family:var(--mono);font-size:11px;letter-spacing:.04em;padding:3px 8px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+.chip.ex{border-color:var(--brass);color:var(--brass)}
+
+details.panel{border:1px solid var(--line);border-radius:6px;background:var(--bg);margin-bottom:16px}
+details.panel.spoil{border:1px dashed var(--brass);background:var(--brass-soft)}
+details.panel summary{cursor:pointer;padding:10px 14px;font-size:14px;font-weight:500;list-style:none;display:flex;justify-content:space-between;gap:8px}
+details.panel summary::-webkit-details-marker{display:none}
+details.panel summary::after{content:"show";font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--brass)}
+details.panel[open] summary::after{content:"hide"}
+.panel-body{padding:2px 16px 16px;display:flex;flex-direction:column;gap:16px;font-size:14px}
+.panel-body h4{margin:0 0 6px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--brass);font-weight:500}
+.panel-body p{margin:0}
+.panel-body ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px}
+.kitrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kitbox{display:flex;flex-direction:column;gap:6px}
+.kitbox textarea{min-height:130px;font-size:13.5px;background:var(--panel)}
+.kitbox textarea.neg{min-height:64px}
+.kithead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+label.upload{position:relative;display:inline-flex;align-items:center;font-size:13px;font-weight:500;padding:6px 11px;border:1px solid var(--line);border-radius:6px;background:var(--panel);cursor:pointer}
+label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.titles{display:flex;flex-wrap:wrap;gap:6px}
+.titles button{font-family:var(--prose);font-size:14px;padding:5px 10px;border-radius:999px;border:1px solid var(--brass);background:transparent;color:var(--ink);cursor:pointer}
+.titles button[aria-pressed="true"]{background:var(--brass);color:var(--panel)}
+.outline{display:flex;flex-direction:column;gap:10px}
+.oc{border-left:2px solid var(--brass);padding:2px 0 2px 12px;display:flex;flex-direction:column;gap:3px}
+.oc .on{font-weight:600}
+.oc dl{margin:0;display:grid;grid-template-columns:max-content minmax(0,1fr);gap:2px 10px}
+.oc dt{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.oc dd{margin:0}
+.oc dd.cliff{color:var(--flag-ink)}
+
+.contents{margin:32px 0 40px;border-top:1px solid var(--line);padding-top:28px}
+.contents h3{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:500;text-align:center;margin:0 0 14px}
+.contents ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.contents li button{width:100%;display:grid;grid-template-columns:2.4em minmax(0,1fr) auto;gap:10px;align-items:baseline;background:none;border:0;border-bottom:1px dotted var(--line);padding:8px 2px;font:inherit;color:var(--ink);cursor:pointer;text-align:left}
+.contents li button:hover .ct{color:var(--accent)}
+.contents .cn{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.contents .ct{font-family:var(--prose);font-size:16px;min-width:0}
+.contents .cs{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.contents li.pending .ct{color:var(--muted)}
+
+.prose{font-family:var(--prose);font-size:clamp(17px,1.9vw,19px);line-height:1.72;hyphens:auto;border-top:1px solid var(--line);padding-top:40px;margin-top:24px}
+.prose:empty{display:none}
+.prose p{margin:0;text-indent:1.5em}
+.prose .chapter > p:first-of-type,.prose .break + p{text-indent:0}
+.prose .chapter{scroll-margin-top:120px}
+.prose .chapter + .chapter{margin-top:64px}
+.prose .chead{text-align:center;margin:0 0 28px;display:flex;flex-direction:column;gap:6px;align-items:center}
+.prose .chead .num{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--brass)}
+.prose .chead .ttl{font-family:var(--prose);font-weight:600;font-size:clamp(22px,3vw,28px);line-height:1.15;text-wrap:balance}
+.prose .chapter > p:first-of-type::first-letter{float:left;font-weight:600;font-size:3.3em;line-height:.82;padding:.06em .08em 0 0;color:var(--accent)}
+.prose .break{text-align:center;color:var(--muted);letter-spacing:.6em;margin:1.2em 0;text-indent:0}
+.prose mark{background:var(--flag);color:var(--flag-ink);border-radius:2px;padding:0 1px}
+.prose .caret{display:inline-block;width:.5em;height:1em;background:var(--brass);vertical-align:-.12em;margin-left:2px}
+.prose .waiting{font-family:var(--prose);font-style:italic;color:var(--muted);text-align:center;text-indent:0}
+.theend{text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin:56px 0 8px}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="brand">
+    <h1>Twist<span>well</span></h1>
+    <p>Stories and books built around a strong hook and a fair twist, written in plain human prose, with a cover and a real book layout.</p>
+  </header>
+
+  <aside>
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" id="tab-write" aria-selected="true" aria-controls="pane-write">New</button>
+      <button type="button" role="tab" id="tab-hist" aria-selected="false" aria-controls="pane-hist">History<span class="count" id="hcount"></span></button>
+    </div>
+
+    <div id="pane-write" role="tabpanel" aria-labelledby="tab-write">
+    <form id="f" novalidate>
+      <fieldset>
+        <span class="label">Format</span>
+        <div class="seg" role="radiogroup" aria-label="Format">
+          <label><input type="radio" name="format" id="fmt-story" value="story" checked><span>Story</span></label>
+          <label><input type="radio" name="format" id="fmt-book" value="book"><span>Book</span></label>
+        </div>
+        <div class="row3">
+          <div class="field">
+            <label class="label" for="chapters">Chapters</label>
+            <input type="number" id="chapters" min="1" max="60" step="1" value="3" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label class="label" for="perch">Words/ch.</label>
+            <input type="number" id="perch" min="400" max="20000" step="100" value="2000" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label class="label" for="words">Total words</label>
+            <input type="number" id="words" min="500" max="150000" step="100" value="6000" inputmode="numeric">
+          </div>
+        </div>
+        <div class="presets" id="presets" aria-label="Total length presets">
+          <span class="label">Total</span>
+          <button type="button" class="pill" data-w="3000">3k</button><button type="button" class="pill" data-w="7500">7.5k</button><button type="button" class="pill" data-w="15000">15k</button><button type="button" class="pill" data-w="40000">40k</button><button type="button" class="pill" data-w="80000">80k</button>
+        </div>
+        <p class="calc" id="calc"></p>
+        <div class="field">
+          <span class="label">How to write it</span>
+          <div class="seg" role="radiogroup" aria-label="Delivery">
+            <label><input type="radio" name="delivery" id="del-all" value="all" checked><span>All at once<small>every chapter in a row</small></span></label>
+            <label><input type="radio" name="delivery" id="del-one" value="one"><span>Chapter by chapter<small>you press next</small></span></label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="row2">
+          <div class="field">
+            <label class="label" for="genre">Genre</label>
+            <select id="genre">
+              <option>Literary</option><option>Psychological thriller</option><option selected>Mystery</option><option>Crime</option><option>Horror</option><option>Science fiction</option><option>Fantasy</option><option>Romance</option><option>Family drama</option><option>Dark comedy</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="twist">Twist</label>
+            <select id="twist">
+              <option value="">Writer's choice</option>
+              <option>Hidden identity</option><option>Unreliable narrator</option><option>The culprit is someone we trusted</option><option>The events happen in a different order than we think</option><option>The motive is the opposite of what it looks like</option><option>The setting is not what it seems</option><option>The victim planned it</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="premise-head">
+            <label class="label" for="premise">Premise (optional)</label>
+            <div class="links"><button type="button" class="link" id="seed">Random</button><button type="button" class="link" id="ideasBtn">Suggest 3</button></div>
+          </div>
+          <textarea id="premise" placeholder="Leave empty and the writer will invent one."></textarea>
+          <div class="ideas" id="ideas" hidden></div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label class="label" for="pov">Point of view</label>
+            <select id="pov"><option value="">Writer's choice</option><option>First person</option><option>Close third person</option><option>Second person</option></select>
+          </div>
+          <div class="field">
+            <label class="label" for="lang">Language</label>
+            <select id="lang"><option>English</option><option>Français</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="tier">Quality</label>
+          <select id="tier"><option value="complex" selected>Best (slower, more natural prose)</option><option value="default">Standard (faster)</option></select>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button class="btn primary" id="go" type="submit">Plan and write</button>
+      </div>
+      <p class="note" id="avail">Free to use. A long book takes a few minutes to write; keep this tab open.</p>
+    </form>
+    </div>
+
+    <div id="pane-hist" role="tabpanel" aria-labelledby="tab-hist" class="history" hidden>
+      <input type="search" id="hsearch" placeholder="Search titles, premises, genres" aria-label="Search history">
+      <div class="hfilters" id="hfilters">
+        <button type="button" class="pill" data-f="all" aria-pressed="true">All</button>
+        <button type="button" class="pill" data-f="story" aria-pressed="false">Stories</button>
+        <button type="button" class="pill" data-f="book" aria-pressed="false">Books</button>
+        <button type="button" class="pill" data-f="wip" aria-pressed="false">Unfinished</button>
+      </div>
+      <ul class="hlist" id="hlist"></ul>
+      <p class="note" id="hnote">Loading your history…</p>
+    </div>
+  </aside>
+
+  <main class="page">
+    <div class="statusbar">
+      <div class="status" id="status" aria-live="polite"><span class="dot"></span><span class="label" id="statusText">Ready</span></div>
+      <div class="bar" id="bar" hidden><span id="barFill"></span></div>
+      <div class="tools" id="tools">
+        <button class="btn small" id="stop" type="button" hidden>Stop</button>
+        <button class="btn small" id="next" type="button" hidden>Write next chapter</button>
+        <button class="btn small" id="rest" type="button" hidden>Write all remaining</button>
+        <button class="btn small" id="clean" type="button" hidden>Clean flagged phrases</button>
+        <button class="btn small" id="again" type="button" hidden>Rewrite last chapter</button>
+        <button class="btn small" id="copy" type="button">Copy with layout</button>
+        <button class="btn small" id="dlDocx" type="button" hidden>Download Word (.docx)</button>
+        <button class="btn small" id="dl" type="button" hidden>Download web page</button>
+        <span class="flags" id="flags"></span>
+      </div>
+    </div>
+
+    <div class="book">
+      <section class="titlepage">
+        <div class="cover" id="coverBox">
+          <canvas id="coverCv" width="1200" height="1800" role="img" aria-label="Book cover"></canvas>
+          <div class="ph" id="coverPh" hidden>Designing the cover…</div>
+        </div>
+        <span class="kind" id="kind"></span>
+        <h2 id="title"></h2>
+        <p class="logline" id="logline"></p>
+        <div class="chips" id="chips"></div>
+      </section>
+
+      <details class="panel" id="kit">
+        <summary>Cover studio: image prompt, your photo, download</summary>
+        <div class="panel-body">
+          <div class="kitrow">
+            <button type="button" class="btn small" id="newCover">New illustrated cover</button>
+            <label class="upload" id="uploadLbl">Use my image<input type="file" id="upload" accept="image/png,image/jpeg,image/webp"></label>
+            <button type="button" class="btn small" id="rmPhoto" hidden>Back to illustrated</button>
+            <button type="button" class="btn small" id="dlCover" hidden>Download cover</button>
+          </div>
+          <div class="kitbox">
+            <div class="kithead"><h4>Realistic cover image prompt</h4><button type="button" class="btn small" id="mkPrompt">Write prompt</button></div>
+            <p class="note" id="kitNote">Writes a detailed prompt for a clean, photographic cover with realistic characters taken from your story. Paste it into an image generator (Midjourney, Higgsfield, Ideogram, Firefly, DALL·E), then use the result above with "Use my image". The title is set on top for you, so the prompt asks for no text.</p>
+            <div id="promptOut" hidden class="kitbox">
+              <div class="kithead"><span class="label">Prompt</span><button type="button" class="link" data-copy="pPrompt">Copy</button></div>
+              <textarea id="pPrompt" aria-label="Image prompt"></textarea>
+              <div class="kithead"><span class="label">Negative prompt (what to avoid)</span><button type="button" class="link" data-copy="pNeg">Copy</button></div>
+              <textarea id="pNeg" class="neg" aria-label="Negative prompt"></textarea>
+              <div class="kithead"><span class="label">Midjourney version</span><button type="button" class="link" data-copy="pMj">Copy</button></div>
+              <textarea id="pMj" class="neg" aria-label="Midjourney prompt"></textarea>
+              <p class="note" id="pNotes"></p>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel spoil" id="plan"><summary>Outline, characters, titles and the twist (spoilers)</summary><div class="panel-body" id="planBody"></div></details>
+      <nav class="contents" id="contents" hidden><h3 id="contentsLabel">Contents</h3><ol id="toc"></ol></nav>
+      <article class="prose" id="prose"></article>
+      <p class="theend" id="theend" hidden>The End</p>
+    </div>
+  </main>
+</div>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const SEG_WORDS = 3000;   // longest stretch written in one request
+const MAX_WORDS = 150000, MAX_CH = 60, MIN_PER_CH = 400, MAX_PER_CH = 20000;
+
+/* ---------- phrases that make prose read as machine-written ---------- */
+const BANNED_WORDS = ["delve","delved","delving","tapestry","testament to","intricate","palpable","unwavering","myriad","labyrinthine","symphony of","kaleidoscope","beacon of","enigmatic","ethereal","a dance of","a sense of","couldn't help but","could not help but","in that moment","a smile tugged","barely above a whisper","a mix of","the weight of the world","something shifted","echoed through","steeled himself","steeled herself","let out a breath","the silence was deafening","the air was thick","time stood still","time seemed to stand still","a stark reminder","newfound","nestled","bustling","vibrant","resonated","embarked","realm","navigate the","a flicker of","the ghost of a smile","a pang of","in the grand scheme","for what felt like an eternity","the world seemed to","eyes widened","jaw tightened","heart hammered","knuckles white","un frisson parcourut","ne put s'empêcher","ne pouvait s'empêcher","une tapisserie","témoignage de","le poids du monde"];
+const BANNED_NAMES = ["Elara","Lyra","Kael","Seraphina","Thorne","Aria","Zara","Sarah Chen","Dr. Aris","Silas","Jaxon","Evelyn Hart","Elias","Nova","Eldoria","Willow Creek","Whispering Woods"];
+const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+const FLAG_RE = new RegExp(
+  "\\b(?:" + [...BANNED_WORDS, ...BANNED_NAMES].map(w=>esc(w).replace(/'/g,"['’]")).join("|") + ")\\b" +
+  "|\\blittle did (?:he|she|they|i|we) know\\b" +
+  "|\\b(?:shiver|shivers|chill|chills) (?:ran |went |crept )?(?:down|up) (?:his|her|their|my) spine\\b" +
+  "|\\bbreath (?:he|she|they|i) (?:didn['’]t|did not) know\\b" +
+  "|\\bit wasn['’]t [^.!?\\n]{1,40}[.!?] it was\\b" +
+  "|\\bsomewhere,? a dog barked\\b", "gi");
+
+const STYLE_RULES = `How to write it:
+- Write like a working novelist with a sharp editor, not like an assistant. Plain, concrete words. Strong nouns and verbs, few adjectives, almost no adverbs. Use contractions the way people speak.
+- Vary sentence length the way real prose does. Fragments now and then are fine. Don't start consecutive paragraphs the same way.
+- Reveal people through what they do, notice and say. Show the dynamics between characters in every scene: who wants what from whom, who is hiding something, who has the upper hand, and how that shifts. Dialogue sounds spoken: people interrupt, dodge, answer the wrong question, leave things out, talk about money and errands. Each main character talks differently, as described in the plan. Nobody explains what the other person already knows.
+- Every scene needs particulars a real person would notice: objects, prices, food, the state of a room, a time on a clock, a street name. Specific beats general.
+- Keep the narrative voice steady from start to finish, as described in the plan's "voice".
+- Trust the reader. Never explain an emotion after showing it. Never end a scene with a line summing up what it meant, a lesson, or a note of hope.
+- Don't open on weather, waking up, or a mirror. No dream sequences. Characters don't constantly nod, sigh, or exchange looks.
+- Similes are rare and come from the character's own world.
+- Use em dashes rarely (no more than one per 500 words). Avoid these patterns entirely: "It wasn't X. It was Y."; "not X, but Y" as a flourish; lists of three adjectives; rhetorical questions in narration; one-word paragraphs for drama.
+- Use only the character names from the plan, spelled exactly the same way every time. Never use these names: ${BANNED_NAMES.join(", ")}.
+- Never use these words or phrases: ${BANNED_WORDS.join(", ")}, "little did they know", "a shiver down her spine", "a breath she didn't know she was holding", "somewhere, a dog barked".
+- Mark a scene change inside a chapter with a line containing only * * *
+- Humor, if any, comes from character and situation, never from the narrator winking at the reader.`;
+
+const TWIST_RULES = `The twist must play fair:
+- It recontextualizes scenes the reader has already read. It is never a brand-new fact dropped at the end.
+- Clues sit in plain sight; a careful reader could catch them but will misread them the first time.
+- Banned twists unless asked for: it was all a dream, dead all along, a simulation, an identical twin, convenient amnesia.
+- After the reveal, let the reader feel it, then end. Never explain the twist back to the reader.`;
+
+const TITLE_RULES = `Titles: think of the kind of title that makes someone pick a book up in a shop. Short (1 to 5 words), concrete, taken from something real inside the story (an object, a place, a phrase a character says, an amount, a date), and slightly odd, so it raises a question the story answers. Avoid stock patterns: "The Silent...", "Echoes of...", "Whispers...", "Shadows of...", "The Secret of...", "The Last...", "...'s Secret", anything with a colon, and any title that gives the twist away. Chapter titles follow the same idea: short and concrete, taken from something in that chapter, never giving away its cliffhanger.`;
+
+const NAME_RULES = `Names: every character gets a first name and a surname that a reader can pronounce correctly on first sight. Choose names real people of that country, region, generation and background actually have, the kind you'd see on a class list or a work rota there. Prefer short, common names with simple spelling: no apostrophes, no unusual letter clusters, no invented or fantasy-style names (even in fantasy, keep names simple and human). No two main characters may start with the same letter or sound alike. Never use: ${BANNED_NAMES.join(", ")}.`;
+
+const HOOK_RULES = `Hook and cliffhangers:
+- The first paragraph must hook the reader: drop them into a specific moment of trouble, oddness or tension, with a concrete detail that raises a question they need answered. No setup, no background first.
+- Every chapter except the last ends on a heavy cliffhanger: cut away at the worst or most revealing moment, in the middle of the action (a discovery, a line of dialogue that changes everything, someone at the door, a lie exposed). Show it; don't announce it. Never resolve it in the same chapter.
+- The next chapter must deal with that cliffhanger's consequence. It may delay it briefly, but never skip or ignore it.`;
+
+const PREMISE_RULES = `A good premise sounds like something a person would tell a friend over coffee: plain words, one or two sentences, ordinary people with real jobs and money worries, a real place, and one odd, concrete detail that makes you want to know more. Grounded in everyday life. Nothing supernatural unless the genre is horror, fantasy or science fiction, and even then keep it close to ordinary life. Avoid: chosen ones, mysterious strangers, "discovers a secret that changes everything", tech-company or AI plots, small towns "with a dark past", dramatic adjectives.`;
+
+const SEEDS = [
+  "A night-shift pharmacist keeps filling prescriptions for a man she's fairly sure died last spring.",
+  "After her father's funeral, a woman finds out he'd been paying rent on a second flat across town for eleven years.",
+  "Two brothers who haven't spoken in six years have one weekend to empty their mother's house before the buyers move in.",
+  "A wedding photographer gets a polite email from the bride asking her to delete one photo. Just one.",
+  "A court interpreter realizes the witness is lying, and she's the only person in the room who can tell.",
+  "A retired bus driver starts getting letters addressed to his wife, who left him thirty years ago.",
+  "A hotel night porter is paid extra every month to keep room 14 empty. One night the key isn't on its hook.",
+  "A teacher marking essays finds one that describes her own childhood, down to the name of her dog.",
+  "A tailor is asked to take in a suit by a man who says he'll be wearing it to his own trial.",
+  "A mechanic buys a cheap car at auction and finds a school bag in the boot with this term's homework in it.",
+  "A bank clerk notices a regular customer has withdrawn the same odd amount every Friday for twenty years.",
+  "A care-home nurse is told one resident must never be left alone with his son. Nobody will say why.",
+  "A family comes home from holiday to find the house cleaner than they left it.",
+  "A ghostwriter finishing a dead man's memoir finds a chapter his widow has never seen.",
+  "An estate agent can't sell a lovely house, and the owner looks relieved every time a buyer pulls out.",
+  "A man is invited to the twentieth reunion of a school class he was never in.",
+  "A cook at a roadside restaurant notices the same lorry driver orders for two every night and eats alone.",
+  "A woman's new neighbour knows her name, her job, and which bin day she always forgets.",
+  "A locksmith is called to let a woman into her own flat, and the dog inside doesn't know her.",
+  "A widower finds his wife's library card was used last week."
+];
+
+/* ---------- helpers ---------- */
+const escHtml = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+const fr = p => (p.settings?.lang || "English") === "Français";
+const fmtN = n => Number(n).toLocaleString("en-US");
+function numWord(n, french){
+  if(french){
+    const u=["","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"], t=["","","vingt","trente","quarante","cinquante","soixante"];
+    const w = n<20 ? u[n] : t[Math.floor(n/10)] + (n%10===0 ? "" : n%10===1 ? " et un" : "-"+u[n%10]);
+    return w.charAt(0).toUpperCase()+w.slice(1);
+  }
+  const u=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"], t=["","","Twenty","Thirty","Forty","Fifty","Sixty"];
+  return n<20 ? u[n] : t[Math.floor(n/10)] + (n%10 ? "-"+u[n%10] : "");
+}
+const chapterLabel = (p,i) => (fr(p) ? "Chapitre " : "Chapter ") + numWord(i+1, fr(p));
+const kindLabel = p => fr(p) ? (p.settings.format==="book"?"Roman":"Nouvelle") : (p.settings.format==="book"?"A novel":"A short story");
+function cleanModelText(t){
+  return String(t||"").replace(/^\s*#+\s.*$/gm,"").replace(/\*\*(.+?)\*\*/g,"$1")
+    .replace(/^\s*(?:\*\s*\*\s*\*|\*{3,}|#{3,}|-{3,}|⁂)\s*$/gm,"* * *").trim();
+}
+const paraList = text => cleanModelText(text).split(/\n+/).map(s=>s.trim()).filter(Boolean);
+function words(text){ return (String(text).trim().match(/\S+/g)||[]).length; }
+const partWords = x => x?.text ? words(x.text) : (x?.words||0);
+const totalWords = p => p.parts.reduce((a,x)=>a+partWords(x),0);
+function countFlags(text){ const m = cleanModelText(text).match(FLAG_RE); return m ? m.length : 0; }
+function dashCount(text){ return (String(text).match(/—/g)||[]).length; }
+const chCount = p => p.plan?.chapters?.length || p.settings.chapters || 1;
+const perChapter = p => Math.max(MIN_PER_CH, Math.round(p.settings.words / chCount(p)));
+const segsFor = p => Math.max(1, Math.ceil(perChapter(p) / SEG_WORDS));
+const isMulti = p => chCount(p) > 1;
+const nextIndex = p => { for(let i=0;i<chCount(p);i++) if(!p.parts[i]?.done) return i; return null; };
+const isComplete = p => !!p.plan && nextIndex(p) === null;
+const slugOf = p => (p.plan?.title||"story").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") || "story";
+
+function parasHtml(text, highlight){
+  return paraList(text).map(p=>{
+    if(p==="* * *") return `<p class="break" aria-label="Scene break">* * *</p>`;
+    let h = escHtml(p);
+    if(highlight) h = h.replace(FLAG_RE, m=>`<mark>${m}</mark>`);
+    return `<p>${h}</p>`;
+  }).join("");
+}
+
+/* ---------- cover ---------- */
+const COVER_FONTS = {"Playfair Display":"700","Oswald":"600","Cormorant Garamond":"600","Archivo Black":"400","Libre Baskerville":"700"};
+const COVER_LAYOUTS = ["frame","centered-motif","bottom-band","full-bleed-motif","split"];
+const HEX = /^#[0-9a-fA-F]{6}$/;
+const PATH_OK = /^[MmLlHhVvCcSsQqTtAaZz0-9.,\s+\-eE]+$/;
+function sanitizeCover(c){
+  if(!c || typeof c!=="object") return null;
+  const d = {bg:"#1F2A2B",bg2:"#121818",ink:"#F0EADC",accent:"#C9A24A"};
+  const pal = {}; for(const k of Object.keys(d)) pal[k] = HEX.test(c.palette?.[k]||"") ? c.palette[k] : d[k];
+  const paths = (Array.isArray(c.paths)?c.paths:[]).slice(0,8).filter(x=>x && typeof x.d==="string" && x.d.length<5000 && PATH_OK.test(x.d))
+    .map(x=>({d:x.d, fill:["ink","accent","bg2","bg"].includes(x.fill)?x.fill:"ink", opacity:Math.min(1,Math.max(.15,Number(x.opacity)||1)), rule:x.rule==="evenodd"?"evenodd":"nonzero"}));
+  return { image:String(c.image||""), layout: COVER_LAYOUTS.includes(c.layout)?c.layout:"frame", font: COVER_FONTS[c.font]?c.font:"Playfair Display",
+    uppercase: !!c.uppercase, palette:pal, texture:["grain","lines","none"].includes(c.texture)?c.texture:"grain", tagline:String(c.tagline||"").slice(0,90), paths, photo: !!c.photo };
+}
+function hash(s){ let h=2166136261; for(const ch of String(s)){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
+function rng(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function wrapFit(c, text, family, weight, maxW, maxLines, start, min){
+  for(let size=start; size>=min; size-=4){
+    c.font = `${weight} ${size}px "${family}", Georgia, serif`;
+    const ws = text.split(/\s+/).filter(Boolean), lines=[]; let line="", ok = true;
+    for(const w of ws){
+      const t = line ? line+" "+w : w;
+      if(c.measureText(t).width <= maxW) line = t;
+      else { if(line) lines.push(line); line = w; if(c.measureText(w).width > maxW) ok = false; }
+    }
+    if(line) lines.push(line);
+    if(ok && lines.length <= maxLines) return {size, lines};
+  }
+  c.font = `${weight} ${min}px "${family}", Georgia, serif`;
+  return {size:min, lines:[text]};
+}
+function spaced(c, text, x, y, spacing, align){
+  const chars=[...text]; const w = chars.reduce((a,ch)=>a+c.measureText(ch).width+spacing,0)-spacing;
+  let cx = align==="center" ? x - w/2 : x;
+  c.textAlign="left"; for(const ch of chars){ c.fillText(ch,cx,y); cx += c.measureText(ch).width+spacing; }
+}
+const imgCache = new Map();
+function loadImg(src){
+  if(imgCache.has(src)) return imgCache.get(src);
+  const pr = new Promise((res,rej)=>{ const im = new Image(); im.onload=()=>res(im); im.onerror=rej; im.src = src; });
+  imgCache.set(src, pr); return pr;
+}
+let coverToken = 0;
+async function drawCover(cv, p){
+  const token = ++coverToken;
+  const s = p.cover; if(!s) return;
+  const W=1200,H=1800,c=cv.getContext("2d"); const pal=s.palette, fam=s.font, wt=COVER_FONTS[fam];
+  let photo = null;
+  if(s.photo && p.coverImg){ try{ photo = await loadImg(p.coverImg); }catch{} }
+  try{ await Promise.all([document.fonts.load(`${wt} 100px "${fam}"`), document.fonts.load(`500 40px "IBM Plex Mono"`), document.fonts.load(`italic 400 40px "Literata"`)]); }catch{}
+  if(token!==coverToken) return;
+  c.setTransform(1,0,0,1,0,0); c.globalAlpha=1; c.clearRect(0,0,W,H); c.shadowColor="transparent"; c.shadowBlur=0;
+  const col = k => pal[k]||pal.ink;
+  const title = s.uppercase ? (p.plan?.title||"").toUpperCase() : (p.plan?.title||"");
+  const kind = kindLabel(p).toUpperCase();
+  const drawTitle = (x, yTop, maxW, align, color, maxLines=3, start=170)=>{
+    const {size, lines} = wrapFit(c, title, fam, wt, maxW, maxLines, start, 60);
+    c.fillStyle=color; c.textAlign=align; c.textBaseline="alphabetic";
+    const lh = size*1.02; lines.forEach((l,i)=>c.fillText(l, x, yTop + size*0.82 + i*lh));
+    return yTop + size*0.82 + (lines.length-1)*lh;
+  };
+  const drawKind = (x,y,color,align="center")=>{ c.font=`500 30px "IBM Plex Mono", monospace`; c.fillStyle=color; spaced(c,kind,x,y,9,align); };
+  const drawTag = (x,y,color,align="center",maxW=900)=>{ if(!s.tagline) return; c.fillStyle=color; c.textAlign=align;
+    const {lines}=wrapFit(c,s.tagline,"Literata","italic 400",maxW,2,40,30); c.font=`italic 400 38px "Literata", Georgia, serif`; lines.forEach((l,i)=>c.fillText(l,x,y+i*50)); };
+
+  if(photo){
+    const r = Math.max(W/photo.width, H/photo.height), iw = photo.width*r, ih = photo.height*r;
+    c.drawImage(photo, (W-iw)/2, (H-ih)/2, iw, ih);
+    let g = c.createLinearGradient(0,0,0,760); g.addColorStop(0,"rgba(0,0,0,.62)"); g.addColorStop(1,"rgba(0,0,0,0)"); c.fillStyle=g; c.fillRect(0,0,W,760);
+    g = c.createLinearGradient(0,1380,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,.6)"); c.fillStyle=g; c.fillRect(0,1380,W,H-1380);
+    c.shadowColor="rgba(0,0,0,.45)"; c.shadowBlur=18;
+    drawKind(W/2,140,"#F3EBDD");
+    drawTitle(W/2,190,W-200,"center","#FFFFFF",3,170);
+    drawTag(W/2,1700,"#F3EBDD");
+    c.shadowColor="transparent"; c.shadowBlur=0;
+  } else {
+    if(s.layout==="split"){ c.fillStyle=pal.bg; c.fillRect(0,0,W,H/2); c.fillStyle=pal.bg2; c.fillRect(0,H/2,W,H/2); }
+    else { const g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,pal.bg); g.addColorStop(1,pal.bg2); c.fillStyle=g; c.fillRect(0,0,W,H); }
+    const motif = (cx,cy,size,alphaMul=1)=>{
+      if(!s.paths.length) return;
+      c.save(); c.translate(cx-size/2, cy-size/2); c.scale(size/100,size/100);
+      for(const pth of s.paths){ try{ c.globalAlpha = pth.opacity*alphaMul; c.fillStyle = col(pth.fill); c.fill(new Path2D(pth.d), pth.rule); }catch{} }
+      c.restore(); c.globalAlpha=1;
+    };
+    switch(s.layout){
+      case "frame":
+        c.strokeStyle=pal.accent; c.lineWidth=5; c.strokeRect(60,60,W-120,H-120); c.lineWidth=2; c.strokeRect(80,80,W-160,H-160);
+        drawKind(W/2,190,pal.accent); motif(W/2,640,560);
+        { const end = drawTitle(W/2,1060,W-280,"center",pal.ink); drawTag(W/2,Math.min(end+110,1640),pal.ink); }
+        break;
+      case "centered-motif":
+        drawKind(W/2,150,pal.accent);
+        { const end = drawTitle(W/2,200,W-200,"center",pal.ink,2,160); motif(W/2,Math.max(end+460,1020),660); }
+        drawTag(W/2,1680,pal.accent);
+        break;
+      case "bottom-band":
+        motif(W/2,600,800);
+        c.fillStyle=pal.accent; c.fillRect(0,1150,W,H-1150);
+        drawKind(W/2,1240,pal.bg);
+        { const end = drawTitle(W/2,1290,W-200,"center",pal.bg,2,150); drawTag(W/2,Math.min(end+100,1700),pal.bg2); }
+        break;
+      case "full-bleed-motif":
+        motif(W*0.56,760,1500,.6);
+        { const g=c.createLinearGradient(0,900,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,pal.bg2); c.fillStyle=g; c.globalAlpha=.9; c.fillRect(0,900,W,H-900); c.globalAlpha=1; }
+        drawKind(100,160,pal.accent,"left");
+        { const {size,lines} = wrapFit(c,title,fam,wt,W-200,3,170,60); const lh=size*1.02; const top = 1560 - lines.length*lh;
+          c.fillStyle=pal.ink; c.textAlign="left"; lines.forEach((l,i)=>c.fillText(l,100,top+size*.82+i*lh)); }
+        drawTag(100,1680,pal.accent,"left");
+        break;
+      case "split":
+        drawKind(W/2,150,pal.accent); drawTitle(W/2,200,W-200,"center",pal.ink,2,150);
+        motif(W/2,H/2+40,620); drawTag(W/2,1680,pal.ink);
+        break;
+    }
+    const r = rng(hash(title));
+    if(s.texture==="grain"){ for(let i=0;i<9000;i++){ c.globalAlpha=r()*.07; c.fillStyle = r()>.5 ? "#000" : "#fff"; c.fillRect(r()*W, r()*H, 2, 2); } }
+    else if(s.texture==="lines"){ c.globalAlpha=.06; c.fillStyle=pal.ink; for(let y=0;y<H;y+=9) c.fillRect(0,y,W,1); }
+    c.globalAlpha=1;
+  }
+  const sg=c.createLinearGradient(0,0,46,0); sg.addColorStop(0,"rgba(0,0,0,.28)"); sg.addColorStop(1,"rgba(0,0,0,0)"); c.fillStyle=sg; c.fillRect(0,0,46,H);
+}
+function coverPrompt(p){
+  const plan = p.plan, s = p.settings;
+  return `Design the front cover for this ${s.format==="book"?"novel":"short story"}.
+
+Title: ${plan.title}
+Logline: ${plan.logline}
+Genre: ${s.genre}
+Setting: ${plan.setting}
+Hook: ${plan.hook||""}
+Main characters: ${(plan.characters||[]).map(c=>`${c.name} (${c.role})`).join("; ")}
+The twist, which the cover must NOT give away: ${plan.twist?.reveal||""}
+
+Pick ONE central image from inside the story (an object, a building, a vehicle, an animal, a figure seen from a distance) that is striking, matches the title, and hints at the mystery without spoiling it. Draw it as a bold silhouette in the style of a screen-printed or linocut book cover: 1 to 6 filled closed shapes in a 100 by 100 box (coordinates 0 to 100), using only absolute SVG path commands M L H V C Q A Z. It must be instantly recognizable at thumbnail size, centered, filling most of the box. Use fill "accent" or "bg2" on a shape to add one detail or a cut-out; use rule "evenodd" for shapes with holes. No text in the image.
+
+Choose colors that fit the genre and the mood of the setting, like a real bookshop cover (not neon, not purple gradients). "ink" must contrast strongly with "bg" and "bg2"; "accent" is a second color that stands out against them.
+
+Reply with only JSON:
+{"image":"what the image is, in a few words","layout":"one of frame, centered-motif, bottom-band, full-bleed-motif, split","font":"one of Playfair Display, Oswald, Cormorant Garamond, Archivo Black, Libre Baskerville (pick what suits the genre)","uppercase":true or false,"palette":{"bg":"#hex","bg2":"#hex","ink":"#hex","accent":"#hex"},"texture":"grain, lines or none","tagline":"a teaser line in ${s.lang} under 10 words, no spoilers","paths":[{"d":"M ... Z","fill":"ink","opacity":1,"rule":"nonzero"}]}`;
+}
+function imagePromptRequest(p){
+  const plan = p.plan, s = p.settings;
+  return `Write an image-generation prompt for a realistic, photographic front cover of this ${s.format==="book"?"novel":"short story"}. Write the prompt in English whatever the book's language.
+
+Title: ${plan.title}
+Genre: ${s.genre}
+Logline: ${plan.logline}
+Setting (place and era): ${plan.setting}
+Hook: ${plan.hook||""}
+Characters: ${(plan.characters||[]).map(c=>`${c.name}, ${c.role}${c.speech?`; ${c.speech}`:""}`).join(" | ")}
+The twist, which the image must NOT give away: ${plan.twist?.reveal||""}
+
+What makes a good cover prompt:
+- One clean, striking scene from the story with one clear focal point. Simple, uncluttered background. Strong shape that reads at thumbnail size.
+- At most one or two people. They must look like real, ordinary people, not models: describe exact age, build, skin tone and features that fit the setting's country and era, hair, specific everyday clothing for their job and the period, posture and a natural, understated expression. Real skin texture, natural proportions, correct hands. Classic cover framing often shows a figure from behind, in profile, partly cropped, or at a distance, which keeps it clean and mysterious.
+- Specific real details of the place (architecture, street furniture, vehicles, objects) and the time of day.
+- Lighting and color that set the genre's mood, limited to 2 or 3 main colors.
+- Photography terms: camera angle, lens (for example 35mm or 50mm), depth of field, natural or cinematic light, subtle film grain.
+- Portrait 2:3 composition with calm empty space in the top third for the title and at the bottom for the author's name.
+- No text, letters, numbers, logos, watermarks, borders or frames anywhere in the image.
+
+Reply with only JSON:
+{"prompt":"one paragraph of 90 to 150 words, the full prompt","negative":"comma-separated list of things to avoid, including: text, letters, watermark, logo, border, extra fingers, deformed hands, distorted face, plastic or airbrushed skin, doll-like faces, oversaturated colors, cartoon, 3D render, CGI look, fantasy glow, cluttered background","scene":"which moment or image from the story this shows and why it works, one sentence"}`;
+}
+
+/* ---------- example shown at rest ---------- */
+const EXAMPLE = {
+  id:"example", example:true, created:0, updated:0, loaded:true,
+  settings:{format:"story",chapters:1,words:600,delivery:"all",genre:"Literary",twist:"Writer's choice",pov:"First person",lang:"English"},
+  cover:sanitizeCover({image:"An old brass key",layout:"frame",font:"Playfair Display",uppercase:false,
+    palette:{bg:"#2E3B3A",bg2:"#151D1D",ink:"#EFE7D6",accent:"#C9A24A"},texture:"grain",tagline:"The key fit perfectly, once.",
+    paths:[{d:"M 26 30 A 16 16 0 1 0 26.01 30 Z M 26 39 A 7 7 0 1 1 25.99 39 Z",fill:"accent",opacity:1,rule:"evenodd"},{d:"M 40 43 L 90 43 L 90 49 L 40 49 Z M 75 49 L 81 49 L 81 59 L 75 59 Z M 84 49 L 90 49 L 90 56 L 84 56 Z",fill:"accent",opacity:1,rule:"nonzero"}]}),
+  coverImg:null, imgPrompt:null,
+  plan:{
+    title:"Twenty Escudos",
+    title_options:["Twenty Escudos","The Plum Tree","Wrong Key","Exact Change","Black and White Tiles"],
+    premise:"A locksmith is called to let an old woman into her house, and her key doesn't fit.",
+    logline:"A locksmith is called to let an old woman into her house, and her key doesn't fit.",
+    hook:"A key that doesn't go in at all, held out like a ticket.",
+    setting:"A terraced street in a Portuguese coastal town, late afternoon.",
+    pov:"First person, the locksmith",
+    voice:"Dry, practical, a tradesman who notices hardware before people. Short sentences, little self-pity.",
+    characters:[{name:"Rui Lopes",role:"52, locksmith",want:"Finish the job and get home",fear:"Being made a fool of",secret:"Has been to this house before and doesn't remember it yet",speech:"Short, practical, a little gruff"},{name:"Maria Costa",role:"Seventies, retired",want:"To get into her house",fear:"Being sent away",secret:"Sold the house years ago",speech:"Polite, exact, lists things"}],
+    dynamics:[{between:"Rui and Maria",tension:"He suspects a con; she treats him like a tradesman she's hired a hundred times.",shift:"Suspicion turns into care once he understands."}],
+    twist:{reveal:"Maria is the former owner who sold the house long ago and still comes back; Rui changed its locks for the new owners last spring.",why_it_works:"The reader suspects a con, then sees every odd detail was memory, not deceit."},
+    clues:[{where:"The key",what:"Old brass key that doesn't fit the keyway",how_misread:"Looks like a stranger trying her luck"},{where:"Her description",what:"Yellow kitchen, black and white tiles, a plum tree",how_misread:"Sounds like a rehearsed pitch"},{where:"The garden",what:"A grey sawn stump next to the shed",how_misread:"Proof she's lying"},{where:"The dog",what:"\"We don't have a dog\"",how_misread:"Panic at being caught"},{where:"Payment",what:"Coins out of circulation for decades",how_misread:"Not seen until the end"}],
+    twist_chapter:1,
+    chapters:[{title:"The Wrong Key",summary:"A locksmith lets an old woman into a house that stopped being hers years ago.",goal:"Get the door open and get home",obstacle:"No ID, a key that doesn't fit",turn:"He recognizes the hall",cliffhanger:"",beats:["Call at a bad hour","Key doesn't fit","No ID, items on the step","Her list of the house","The stump","The dog","Door opens on a grey hall","He remembers the house","Paid in escudos"]}]
+  },
+  parts:[{done:true,segDone:1,recap:"",text:`The call came at ten past four, which is the worst time, because school traffic on Rua Ferreira doesn't clear until six and I'd promised Dina I'd pick up the gas bottle.
+
+"It's a Yale," the woman said. "An old one. My key won't turn."
+
+She was waiting on the step when I pulled up. Seventy or so, a green cardigan buttoned wrong by one hole. She held the key out before I'd shut the van door, the way you hold out a ticket.
+
+It was brass, worn smooth at the shoulders. It didn't go in. Not stiff, not jammed. It just didn't fit the keyway.
+
+"That's not for this lock," I said.
+
+"It's the only key I've ever had for this door."
+
+I've heard that line before. Usually from people who've been married a long time and are standing outside a house they aren't supposed to be at anymore. I asked for something with the address on it. She went through her handbag twice, slowly, setting things on the step as she went: a comb, a bus pass, a paper bag of boiled sweets, a roll of coins held with a rubber band.
+
+"I don't carry it," she said finally. "Nobody ever asks."
+
+I should have left. Most days I would have. But she started telling me about the house without my asking, and it sounded less like a pitch than a list she'd learned so she wouldn't lose it. Hallway tiles, black and white. Kitchen painted yellow. A plum tree out the back that dropped fruit on the shed roof all August, so at night you'd hear it, bang, bang, like someone at the door.
+
+I looked down the side passage. There was a shed. Next to it was a stump, sawn flat and gone grey.
+
+"When did you last see the tree?"
+
+She frowned at me as if I'd asked something stupid. "This morning."
+
+A dog started up inside when I knelt at the lock. A big one, from the sound. She took a step back.
+
+"We don't have a dog," she said, mostly to herself.
+
+The cylinder was cheap and I had it open in under a minute. I pushed the door six inches. Grey floor. A grey kitchen at the end of the hall. A Labrador wagging its whole body, delighted with both of us.
+
+She didn't go in. She looked past the dog for a long time.
+
+"They've changed the tiles," she said.
+
+That was when I knew the hall. Last spring, new locks, a young couple with boxes everywhere. The husband had told me the lady who sold them the place still came by now and then, and they didn't have the heart to say anything. He'd given me her daughter's number in case. I'd written it on the invoice and never thought about it again.
+
+The daughter answered on the second ring. She didn't sound surprised.
+
+While we waited, the woman sat on the step and counted coins from the rubber band into my hand. Old ones, the twenty-escudo pieces with the ship on them, gone since before my son was born. She was very careful to give me the right amount.
+
+I kept them. Dina says that's sentimental. I told her it was the correct price for a job I wasn't supposed to do.`}]
+};
+
+/* ---------- history storage: account (db) when available, this browser otherwise ---------- */
+const LS = "twistwell.history.v4";
+let db = null, uid = null;
+let history = [];   // project objects; chapter text may be unloaded (loaded:false)
+const writeChains = new Map();
+function queued(path, fn){ const prev = writeChains.get(path) || Promise.resolve(); const next = prev.catch(()=>{}).then(fn); writeChains.set(path, next); return next; }
+const metaOf = p => ({ kind:"project", id:p.id, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, hasImg:!!p.coverImg,
+  parts:p.parts.map(x=>x?({done:!!x.done,segDone:x.segDone||0,recap:x.recap||"",words:partWords(x)}):null), created:p.created, updated:p.updated });
+function lsSave(){
+  try{
+    const rows = history.filter(p=>!p.example).slice(0,40).map(p=>({...p}));
+    localStorage.setItem(LS, JSON.stringify(rows));
+  } catch {
+    try{ localStorage.setItem(LS, JSON.stringify(history.filter(p=>!p.example).slice(0,40).map(p=>({...p, coverImg:null})))); } catch {}
+  }
+}
+async function storeSave(p, opts={}){
+  if(p.example) return;
+  p.updated = Date.now();
+  if(!history.includes(p)) history.unshift(p);
+  renderHistory();
+  if(!db){ lsSave(); return; }
+  const col = db.collection("data/users/"+uid);
+  const jobs = [queued("p_"+p.id, ()=>col.doc("p_"+p.id).set(JSON.parse(JSON.stringify(metaOf(p)))))];
+  for(const i of (opts.chapters||[])){ const x = p.parts[i]; if(!x) continue;
+    jobs.push(queued(`c_${p.id}_${i}`, ()=>col.doc(`c_${p.id}_${i}`).set({kind:"chapter", pid:p.id, i, text:x.text||""}))); }
+  if(opts.img) jobs.push(queued("i_"+p.id, ()=> p.coverImg ? col.doc("i_"+p.id).set({kind:"image", pid:p.id, data:p.coverImg}) : col.doc("i_"+p.id).delete()));
+  try{ await Promise.all(jobs); }
+  catch(e){ setStatus(e?.code==="quota_exceeded" ? "Your history storage is full. Delete some old stories to keep saving." : "Couldn't save to your history just now. It will retry on the next change.","err"); }
+}
+async function storeLoad(p){
+  if(p.loaded || !db) { p.loaded = true; return; }
+  const col = db.collection("data/users/"+uid);
+  const n = p.parts.length;
+  const snaps = await Promise.all([...Array.from({length:n},(_,i)=>col.doc(`c_${p.id}_${i}`).get()), p.hasImg ? col.doc("i_"+p.id).get() : Promise.resolve(null)]);
+  for(let i=0;i<n;i++){ const d = snaps[i]?.exists ? snaps[i].data() : null; if(p.parts[i]) p.parts[i].text = d?.text || ""; }
+  const im = snaps[n]; if(im?.exists) p.coverImg = im.data().data || null;
+  p.loaded = true;
+}
+async function storeDelete(p){
+  history = history.filter(x=>x!==p);
+  renderHistory();
+  if(!db){ lsSave(); return; }
+  const col = db.collection("data/users/"+uid);
+  const jobs = [col.doc("p_"+p.id).delete(), col.doc("i_"+p.id).delete()];
+  for(let i=0;i<Math.max(p.parts.length, chCount(p));i++) jobs.push(col.doc(`c_${p.id}_${i}`).delete());
+  try{ await Promise.all(jobs); }catch{}
+}
+function fromMeta(m){
+  return { id:m.id, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, hasImg:!!m.hasImg, coverImg:null,
+    parts:(m.parts||[]).map(x=>x?({...x, text:undefined}):null), created:m.created||0, updated:m.updated||0, loaded:false };
+}
+function readLocal(){
+  const out = [];
+  for(const key of [LS,"twistwell.shelf.v3","twistwell.shelf.v2"]){
+    try{ const rows = JSON.parse(localStorage.getItem(key)||"[]"); if(Array.isArray(rows)) rows.forEach(r=>{ if(r && r.id && r.settings && !out.some(x=>x.id===r.id)){ r.loaded = true; r.updated = r.updated||r.created||0; if(r.cover) r.cover = sanitizeCover(r.cover); out.push(r);} }); }catch{}
+  }
+  return out;
+}
+async function storeInit(){
+  try{
+    const [d, u] = await Promise.all([window.claude?.use?.("db"), window.claude?.use?.("user")]);
+    const id = await u?.id?.();
+    if(d && id){ db = d; uid = id; }
+  }catch{ db = null; }
+  if(db){
+    try{
+      const snap = await db.collection("data/users/"+uid).where("kind","==","project").get();
+      history = snap.docs.map(d=>fromMeta(d.data()));
+      // bring over anything saved in this browser by earlier versions
+      const local = readLocal().filter(r=>!history.some(h=>h.id===r.id));
+      let migrated = false;
+      try{ migrated = localStorage.getItem("twistwell.migrated")==="1"; }catch{}
+      if(!migrated && local.length){
+        for(const r of local){ history.push(r); await storeSave(r, {chapters:r.parts.map((_,i)=>i), img:!!r.coverImg}); r.updated = r.updated; }
+        try{ localStorage.setItem("twistwell.migrated","1"); }catch{}
+      }
+      $("hnote").textContent = "Saved to your Claude account, so it follows you to any device.";
+    } catch {
+      db = null;
+    }
+  }
+  if(!db){ history = readLocal(); $("hnote").textContent = "Saved in this browser only."; }
+  history.sort((a,b)=>(b.updated||0)-(a.updated||0));
+  renderHistory();
+}
+
+/* ---------- state ---------- */
+let current = EXAMPLE;
+let sample = null, downloads = null, ctl = null, busy = false;
+const coverBusy = new Set();
+let hFilter = "all";
+
+/* ---------- rendering ---------- */
+function renderPlan(p){
+  const plan = p.plan;
+  $("plan").hidden = !plan;
+  if(!plan) return;
+  const L = [];
+  if(plan.title_options?.length){
+    L.push(`<div><h4>Title options (tap to switch)</h4><div class="titles">${plan.title_options.map(t=>`<button type="button" data-title="${escHtml(t)}" aria-pressed="${t===plan.title}">${escHtml(t)}</button>`).join("")}</div></div>`);
+  }
+  if(plan.premise) L.push(`<div><h4>Premise</h4><p>${escHtml(plan.premise)}</p></div>`);
+  if(plan.hook) L.push(`<div><h4>The hook</h4><p>${escHtml(plan.hook)}</p></div>`);
+  if(plan.characters?.length) L.push(`<div><h4>Characters</h4><ul>${plan.characters.map(c=>`<li><b>${escHtml(c.name)}</b>, ${escHtml(c.role)}. Wants: ${escHtml(c.want)}.${c.fear?` Fears: ${escHtml(c.fear)}.`:""}${c.secret?` Hides: ${escHtml(c.secret)}.`:""}${c.speech?` Talks: ${escHtml(c.speech)}.`:""}</li>`).join("")}</ul></div>`);
+  if(plan.dynamics?.length) L.push(`<div><h4>Character dynamics</h4><ul>${plan.dynamics.map(d=>`<li><b>${escHtml(d.between)}:</b> ${escHtml(d.tension)}${d.shift?` <i>Over the story: ${escHtml(d.shift)}</i>`:""}</li>`).join("")}</ul></div>`);
+  if(plan.twist){ L.push(`<div><h4>The twist${plan.twist_chapter && isMulti(p)?` · revealed in chapter ${escHtml(plan.twist_chapter)}`:""}</h4><p>${escHtml(plan.twist.reveal)}</p></div>`);
+    if(plan.twist.why_it_works) L.push(`<div><h4>Why it lands</h4><p>${escHtml(plan.twist.why_it_works)}</p></div>`); }
+  if(plan.clues?.length) L.push(`<div><h4>Clues planted</h4><ul>${plan.clues.map(c=>`<li><b>${escHtml(c.where)}:</b> ${escHtml(c.what)}${c.how_misread?` <i>(misread as: ${escHtml(c.how_misread)})</i>`:""}</li>`).join("")}</ul></div>`);
+  if(plan.setting || plan.voice) L.push(`<div><h4>Setting and voice</h4><p>${escHtml(plan.setting||"")}${plan.voice?` ${escHtml(plan.voice)}`:""}</p></div>`);
+  if(plan.chapters?.length) L.push(`<div><h4>Detailed outline</h4><div class="outline">${plan.chapters.map((c,i)=>`<div class="oc"><span class="on">${i+1}. ${escHtml(c.title)}</span><span>${escHtml(c.summary)}</span><dl>${c.goal?`<dt>Goal</dt><dd>${escHtml(c.goal)}</dd>`:""}${c.obstacle?`<dt>Against</dt><dd>${escHtml(c.obstacle)}</dd>`:""}${c.turn?`<dt>Turn</dt><dd>${escHtml(c.turn)}</dd>`:""}${c.beats?.length?`<dt>Scenes</dt><dd>${c.beats.map(escHtml).join(" · ")}</dd>`:""}${c.cliffhanger?`<dt>Ends on</dt><dd class="cliff">${escHtml(c.cliffhanger)}</dd>`:""}</dl></div>`).join("")}</div></div>`);
+  $("planBody").innerHTML = L.join("");
+}
+$("planBody").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-title]"); if(!b || !current.plan || current.example) return;
+  current.plan.title = b.dataset.title; storeSave(current); render(current);
+});
+
+function chapterSectionHtml(p, i, streaming){
+  const part = p.parts[i], ch = p.plan?.chapters?.[i] || {};
+  const head = `<header class="chead"><span class="num">${escHtml(chapterLabel(p,i))}</span>${ch.title?`<span class="ttl">${escHtml(ch.title)}</span>`:""}</header>`;
+  const body = part?.text ? parasHtml(part.text, !streaming) : `<p class="waiting">${fr(p)?"En cours d'écriture…":"Writing…"}</p>`;
+  return head + body;
+}
+
+function renderCover(p){
+  const has = !!p.cover, working = coverBusy.has(p.id);
+  $("coverCv").hidden = !has;
+  $("coverPh").hidden = has;
+  $("coverPh").textContent = working ? (fr(p)?"Création de la couverture…":"Designing the cover…") : "No cover yet";
+  $("coverBox").hidden = !p.plan && !busy;
+  $("kit").hidden = !p.plan;
+  $("newCover").textContent = working ? "Designing…" : has && !p.cover?.photo ? "New illustrated cover" : "Illustrated cover";
+  $("newCover").disabled = working || !sample || p.example;
+  $("uploadLbl").hidden = p.example;
+  $("rmPhoto").hidden = !p.cover?.photo || p.example;
+  $("dlCover").hidden = !has || !downloads;
+  $("mkPrompt").disabled = !sample || !p.plan || p.example || coverBusy.has("prompt:"+p.id);
+  $("mkPrompt").textContent = coverBusy.has("prompt:"+p.id) ? "Writing…" : p.imgPrompt ? "Write a new prompt" : "Write prompt";
+  const ip = p.imgPrompt;
+  $("promptOut").hidden = !ip;
+  if(ip){ $("pPrompt").value = ip.prompt||""; $("pNeg").value = ip.negative||""; $("pMj").value = `${ip.prompt||""} --ar 2:3 --style raw --no text, letters, watermark`; $("pNotes").textContent = ip.scene ? `Scene: ${ip.scene}` : ""; }
+  if(has) drawCover($("coverCv"), p);
+  $("coverCv").setAttribute("aria-label", has ? `Cover: ${p.cover.photo?"your image":p.cover.image||"book cover"}` : "Book cover");
+}
+
+function render(p){
+  current = p;
+  const plan = p.plan || {}, s = p.settings;
+  $("kind").textContent = kindLabel(p);
+  $("title").textContent = plan.title || (busy ? (fr(p)?"Préparation…":"Planning…") : "Untitled");
+  $("logline").textContent = plan.logline || "";
+  const tw = totalWords(p);
+  const chips = [];
+  if(p.example) chips.push(`<span class="chip ex">Example</span>`);
+  if(s.genre) chips.push(`<span class="chip">${escHtml(s.genre)}</span>`);
+  if(plan.chapters) chips.push(`<span class="chip">${chCount(p)} ${chCount(p)>1?"chapters":"chapter"}</span>`);
+  chips.push(`<span class="chip">${fmtN(tw)} / ${fmtN(s.words)} words</span>`);
+  if(tw) chips.push(`<span class="chip">${Math.max(1,Math.round(tw/230))} min read</span>`);
+  $("chips").innerHTML = chips.join("");
+  renderPlan(p);
+  renderCover(p);
+
+  const multi = !!plan.chapters && isMulti(p);
+  $("contents").hidden = !multi;
+  $("contentsLabel").textContent = fr(p) ? "Table des matières" : "Contents";
+  if(multi){
+    $("toc").innerHTML = plan.chapters.map((c,i)=>{
+      const part = p.parts[i], st = part?.done ? `${fmtN(partWords(part))} w` : part?.text ? "in progress" : "not written";
+      return `<li class="${part?.text?"":"pending"}"><button type="button" data-ch="${i}"><span class="cn">${i+1}</span><span class="ct">${escHtml(c.title||chapterLabel(p,i))}</span><span class="cs">${st}</span></button></li>`;
+    }).join("");
+  }
+  $("prose").innerHTML = p.parts.map((x,i)=> x ? `<section class="chapter" id="ch-${i}">${chapterSectionHtml(p,i,false)}</section>` : "").join("");
+  $("theend").hidden = !isComplete(p);
+  $("theend").textContent = fr(p) ? "Fin" : "The End";
+  updateTools();
+  renderHistory();
+}
+function renderStreamingChapter(p, i){
+  if(current !== p) return;
+  let sec = $("ch-"+i);
+  if(!sec){ sec = document.createElement("section"); sec.className="chapter"; sec.id="ch-"+i; $("prose").appendChild(sec); }
+  sec.innerHTML = chapterSectionHtml(p,i,true);
+  sec.lastElementChild?.insertAdjacentHTML("beforeend",'<span class="caret"></span>');
+}
+$("toc").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-ch]"); if(!b) return;
+  const sec = $("ch-"+b.dataset.ch); if(sec) sec.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block:"start"});
+});
+
+function updateTools(){
+  const p = current, has = p.parts.some(x=>x?.text);
+  const all = p.parts.map(x=>x?.text||"").join("\n\n");
+  const n = countFlags(all), d = dashCount(all), w = words(all);
+  const dashHeavy = w && d > Math.max(2, w/500);
+  $("flags").innerHTML = !has ? "" : (n ? `<b>${n}</b> flagged phrase${n>1?"s":""}` : "No flagged phrases") + (dashHeavy ? ` · ${d} em dashes` : "");
+  const canWork = !busy && !!sample && !p.example && !!p.plan;
+  const ni = p.plan ? nextIndex(p) : null;
+  $("stop").hidden = !busy;
+  $("next").hidden = busy || !p.plan || ni === null || p.example;
+  if(ni !== null) $("next").textContent = !isMulti(p) ? "Continue writing" : p.parts[ni]?.text ? `Finish chapter ${ni+1}` : `Write chapter ${ni+1} of ${chCount(p)}`;
+  $("rest").hidden = busy || !p.plan || ni === null || p.example || !isMulti(p) || ni === chCount(p)-1;
+  $("clean").hidden = busy || !has || !(n || dashHeavy) || p.example;
+  $("again").hidden = busy || !has || p.example;
+  $("again").textContent = isMulti(p) ? "Rewrite last chapter" : "Rewrite story";
+  $("dl").hidden = $("dlDocx").hidden = busy || !has || !downloads;
+  $("copy").hidden = busy || !has;
+  ["next","rest","clean","again"].forEach(id=>$(id).disabled = !canWork);
+  $("go").disabled = busy || !sample || !settingsValid();
+  $("seed").disabled = busy; $("ideasBtn").disabled = busy || !sample;
+}
+
+/* ---------- history panel ---------- */
+function renderHistory(){
+  const q = $("hsearch").value.trim().toLowerCase();
+  const items = [...history].sort((a,b)=>(b.updated||0)-(a.updated||0)).filter(p=>{
+    if(hFilter==="story" && p.settings.format!=="story") return false;
+    if(hFilter==="book" && p.settings.format!=="book") return false;
+    if(hFilter==="wip" && isComplete(p)) return false;
+    if(!q) return true;
+    return [p.plan?.title, p.plan?.premise, p.plan?.logline, p.settings.genre, p.settings.premise].join(" ").toLowerCase().includes(q);
+  });
+  $("hcount").textContent = history.length ? String(history.length) : "";
+  const rows = items.map(p=>{
+    const pal = p.cover?.palette, done = p.parts.filter(x=>x?.done).length, complete = isComplete(p);
+    const date = p.updated ? new Date(p.updated).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}) : "";
+    const sw = pal ? `background:linear-gradient(${pal.bg},${pal.bg2});color:${pal.accent}` : "background:var(--line);color:var(--muted)";
+    return `<li data-id="${escHtml(p.id)}" class="${p===current?"active":""}">
+      <span class="sw" style="${sw}" aria-hidden="true">${escHtml((p.plan?.title||"?").trim().charAt(0).toUpperCase())}</span>
+      <button class="open" type="button"><span class="t">${escHtml(p.plan?.title||"Untitled (planning stopped)")}</span>
+        <span class="m">${p.settings.format==="book"?"Book":"Story"} · ${escHtml(p.settings.genre)} · ${fmtN(totalWords(p))} w · ${done}/${chCount(p)} ch</span>
+        <span class="m">${escHtml(date)}</span>
+        <span class="st ${complete?"done":"wip"}">${complete?"Finished":"In progress"}</span></button>
+      <button class="del" type="button" aria-label="Delete from history">delete</button></li>`;
+  }).join("");
+  $("hlist").innerHTML = rows + `<li data-id="example" class="${current===EXAMPLE?"active":""}"><span class="sw" style="background:linear-gradient(#2E3B3A,#151D1D);color:#C9A24A" aria-hidden="true">T</span><button class="open" type="button"><span class="t">Twenty Escudos</span><span class="m">Example story</span></button><span></span></li>`;
+  if(!history.length && !q) $("hlist").insertAdjacentHTML("afterbegin", `<li style="display:block"><p class="hempty">Nothing written yet. Everything you write lands here automatically.</p></li>`);
+  else if(!items.length) $("hlist").insertAdjacentHTML("afterbegin", `<li style="display:block"><p class="hempty">No matches.</p></li>`);
+}
+$("hsearch").addEventListener("input", renderHistory);
+$("hfilters").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-f]"); if(!b) return;
+  hFilter = b.dataset.f; [...$("hfilters").children].forEach(x=>x.setAttribute("aria-pressed", String(x===b))); renderHistory();
+});
+$("hlist").addEventListener("click", async e=>{
+  const li = e.target.closest("li[data-id]"); if(!li || busy) return;
+  const id = li.dataset.id;
+  const p = id==="example" ? EXAMPLE : history.find(x=>x.id===id);
+  if(!p) return;
+  if(e.target.closest(".del")){
+    if(li.dataset.confirm){ if(current===p) render(EXAMPLE); await storeDelete(p); }
+    else { li.dataset.confirm="1"; e.target.textContent="sure?"; setTimeout(()=>{ if(li.isConnected){ delete li.dataset.confirm; e.target.textContent="delete"; } },3000); }
+    return;
+  }
+  if(!e.target.closest(".open")) return;
+  if(!p.loaded){ setStatus("Opening…","busy"); try{ await storeLoad(p); }catch{ setStatus("Couldn't open that one just now. Try again.","err"); return; } }
+  render(p); setStatus("Ready"); setProgress(null);
+  if(matchMedia("(max-width:900px)").matches) document.querySelector("main.page").scrollIntoView({block:"start"});
+});
+function showTab(which){
+  const hist = which==="hist";
+  $("tab-write").setAttribute("aria-selected", String(!hist)); $("tab-hist").setAttribute("aria-selected", String(hist));
+  $("pane-write").hidden = hist; $("pane-hist").hidden = !hist;
+}
+$("tab-write").addEventListener("click", ()=>showTab("write"));
+$("tab-hist").addEventListener("click", ()=>showTab("hist"));
+
+/* ---------- status ---------- */
+function setStatus(text, kind=""){ $("status").className = "status " + kind; $("statusText").textContent = text; }
+function setProgress(frac){ $("bar").hidden = frac==null; if(frac!=null) $("barFill").style.width = Math.round(Math.min(1,frac)*100)+"%"; }
+function errCopy(e){
+  switch(e?.code){
+    case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed":
+      return "Claude isn't allowed for this page in this view, so writing is off.";
+    case "no_key": return "This site isn't set up yet: the owner needs to add the Anthropic API key on Netlify.";
+    case "no_credit": return "The writing service is out of credit. The site owner needs to top up the Anthropic account.";
+    case "access_code": return "Enter the access code at the top of the page, then try again.";
+    case "rate_limited": return "Usage limit or too many requests. Wait a while, then press Continue. Nothing written is lost.";
+    case "session_expired": return "Your Claude session expired. Sign in again, then press Continue.";
+    case "refused": return "Claude declined this request. Change the premise and try again.";
+    case "invalid_json": return "The answer came back in a broken format. Press the button again.";
+    case "prompt_too_large": return "This book has grown too large to send in one request. Try fewer chapters.";
+    case "empty_completion": return "Nothing came back. Try again.";
+    default: return "The connection dropped. What was written is kept. Press Continue to pick up where it stopped.";
+  }
+}
+const isFatal = e => ["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed"].includes(e?.code);
+function failed(e){
+  if(e?.code==="cancelled"){ setStatus("Stopped. Press Continue to pick up where it stopped."); return; }
+  setStatus(errCopy(e),"err");
+  if(isFatal(e)){ sample = null; $("avail").textContent = errCopy(e); }
+}
+function setBusy(b){ busy = b; updateTools(); }
+
+/* ---------- settings: chapters × words per chapter = total ---------- */
+function readSettings(){
+  return {
+    format: document.querySelector('input[name="format"]:checked').value,
+    chapters: Math.round(Number($("chapters").value)),
+    words: Math.round(Number($("words").value)),
+    delivery: document.querySelector('input[name="delivery"]:checked').value,
+    genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
+    pov:$("pov").value || "Writer's choice", lang:$("lang").value, tier:$("tier").value
+  };
+}
+function settingsValid(){
+  const s = readSettings(), per = s.words/s.chapters;
+  return s.chapters>=1 && s.chapters<=MAX_CH && s.words>=500 && s.words<=MAX_WORDS && per >= MIN_PER_CH && per <= MAX_PER_CH;
+}
+function updateCalc(){
+  const s = readSettings(), el = $("calc"), per = s.words/s.chapters;
+  if(!(s.chapters>=1 && s.chapters<=MAX_CH)){ el.textContent = `Chapters must be between 1 and ${MAX_CH}.`; el.className="calc warn"; }
+  else if(!(s.words>=500 && s.words<=MAX_WORDS)){ el.textContent = `Total must be between 500 and ${fmtN(MAX_WORDS)} words.`; el.className="calc warn"; }
+  else if(per < MIN_PER_CH){ el.textContent = `Chapters need at least ${MIN_PER_CH} words each.`; el.className="calc warn"; }
+  else if(per > MAX_PER_CH){ el.textContent = `Chapters can be up to ${fmtN(MAX_PER_CH)} words. Add chapters instead.`; el.className="calc warn"; }
+  else {
+    const mins = Math.round(s.words/230);
+    const time = mins >= 90 ? `${(mins/60).toFixed(1)} hours` : `${mins} min`;
+    el.textContent = `${s.chapters} × ${fmtN(Math.round(per))} words = ${fmtN(s.words)} words · about ${time} of reading`;
+    el.className = "calc";
+  }
+  $("go").textContent = s.delivery==="one" && s.chapters>1 ? "Plan it, write chapter 1" : s.format==="book" ? "Plan and write the book" : "Plan and write the story";
+  updateTools();
+}
+const num = id => Math.round(Number($(id).value));
+$("chapters").addEventListener("input", ()=>{ const ch = num("chapters"); if(ch>=1) $("words").value = Math.min(MAX_WORDS, ch * (num("perch")||2000)); updateCalc(); });
+$("perch").addEventListener("input", ()=>{ const per = num("perch"); if(per>0) $("words").value = Math.min(MAX_WORDS, num("chapters") * per); updateCalc(); });
+$("words").addEventListener("input", ()=>{ const w = num("words"), ch = num("chapters"); if(w>0 && ch>=1) $("perch").value = Math.round(w/ch); updateCalc(); });
+document.querySelectorAll('input[name="delivery"]').forEach(r=>r.addEventListener("change", updateCalc));
+document.querySelectorAll('input[name="format"]').forEach(r=>r.addEventListener("change", ()=>{
+  const book = document.querySelector('input[name="format"]:checked').value==="book";
+  $("chapters").value = book ? 12 : 3;
+  $("perch").value = book ? 3000 : 2000;
+  $("words").value = num("chapters") * num("perch");
+  (book ? $("del-one") : $("del-all")).checked = true;
+  updateCalc();
+}));
+$("presets").addEventListener("click", e=>{ const b = e.target.closest("button[data-w]"); if(!b) return; $("words").value = b.dataset.w; $("perch").value = Math.round(Number(b.dataset.w)/Math.max(1,num("chapters"))); updateCalc(); });
+
+/* ---------- premises ---------- */
+$("seed").addEventListener("click", ()=>{
+  const cur = $("premise").value; let s;
+  do { s = SEEDS[Math.floor(Math.random()*SEEDS.length)]; } while(s===cur);
+  $("premise").value = s; $("ideas").hidden = true;
+});
+$("ideasBtn").addEventListener("click", async ()=>{
+  if(busy || !sample) return;
+  const s = readSettings();
+  $("ideas").hidden = false; $("ideas").innerHTML = `<p class="note">Thinking of premises…</p>`;
+  $("ideasBtn").disabled = true;
+  try{
+    const list = await sample.json(`Suggest 3 different premises for a ${s.genre.toLowerCase()} ${s.format==="book"?"novel":"story"} that will have a twist (type: ${s.twist}). Write them in ${s.lang}.
+
+${PREMISE_RULES}
+
+Each premise is at most 35 words, opens with a hook, and must not reveal the twist. Make the three feel different from each other in place, job and situation.
+Reply with only a JSON array of 3 strings.`, { modelTier:"default", cache:false });
+    const ideas = (Array.isArray(list) ? list : []).filter(x=>typeof x==="string").slice(0,3);
+    if(!ideas.length) throw {code:"invalid_json"};
+    $("ideas").innerHTML = ideas.map(t=>`<button type="button">${escHtml(t)}</button>`).join("");
+  } catch(e){
+    $("ideas").innerHTML = `<p class="note">${escHtml(e?.code==="invalid_json" ? "Those came back garbled. Press Suggest 3 again." : errCopy(e))}</p>`;
+    if(isFatal(e)) sample = null;
+  } finally { updateTools(); }
+});
+$("ideas").addEventListener("click", e=>{ const b = e.target.closest("button"); if(!b) return; $("premise").value = b.textContent; $("ideas").hidden = true; });
+
+/* ---------- prompts ---------- */
+function planPrompt(s){
+  const per = Math.round(s.words/s.chapters), segs = Math.max(1, Math.ceil(per/SEG_WORDS));
+  const beatsN = Math.min(12, Math.max(3, segs*3));
+  const kind = s.format==="book" ? "a novel" : "a story";
+  return `You are planning ${kind} of about ${fmtN(s.words)} words in exactly ${s.chapters} chapter${s.chapters>1?"s":""} (about ${fmtN(per)} words each), built around a strong hook, clear character dynamics, heavy chapter cliffhangers and a twist.
+
+Genre: ${s.genre}
+Twist type: ${s.twist}
+Point of view: ${s.pov}
+Language of every field and of the final text: ${s.lang}
+Premise from the writer: ${s.premise || "None. Invent one."}
+
+${PREMISE_RULES}
+If the writer gave a premise, keep it and only sharpen it into that plain, natural form.
+
+${NAME_RULES}
+
+Character dynamics: give the main characters wants that collide. For each important pair, define what pulls them together, what pushes them apart, who holds power, and how that changes over the story. At least one relationship must turn during the story.
+
+${HOOK_RULES}
+
+${TWIST_RULES}
+Before choosing the twist, think of the one most readers would guess, then pick one they won't that still fits every clue. Plant clues across the early and middle chapters.
+
+${TITLE_RULES}
+
+Structure: a clear shape with rising stakes. Each chapter has a goal, an obstacle, a turn that changes the situation, and (except the last) a cliffhanger that the next chapter must pick up. Characters keep the same names, ages, jobs and facts throughout. Ground it in a real, specific place and time.
+
+Reply with only JSON in this shape:
+{
+ "title_options": ["5 different title ideas following the title rules"],
+ "title": "the strongest of the five",
+ "premise": "the premise in one or two plain sentences",
+ "logline": "one intriguing sentence for the back cover, no spoilers",
+ "hook": "the exact opening moment and the question it plants in the reader's head",
+ "setting": "place and time",
+ "pov": "who tells it",
+ "voice": "the narrative voice in concrete terms: rhythm, vocabulary, attitude",
+ "characters": [{"name":"First Last","role":"age and job","want":"","fear":"","secret":"","speech":"how they talk"}],
+ "dynamics": [{"between":"Name and Name","tension":"what pulls them together and apart, and who has the upper hand","shift":"how it changes over the story"}],
+ "twist": {"reveal":"what is actually true","why_it_works":"how it reframes earlier scenes"},
+ "clues": [{"where":"chapter number and scene","what":"","how_misread":""}],
+ "twist_chapter": number,
+ "chapters": [{"title":"short chapter title","summary":"2 to 3 sentences of what happens","goal":"what the point-of-view character wants in this chapter","obstacle":"who or what is in the way","turn":"what changes","cliffhanger":"the exact moment the chapter cuts off on (empty for the last chapter)","beats":["${beatsN} concrete scene beats in order"]}]
+}
+"chapters" must contain exactly ${s.chapters} item${s.chapters>1?"s":""}, every one with a title.`;
+}
+
+function segPrompt(p, i, k, K){
+  const s = p.settings, plan = p.plan, ch = plan.chapters[i], N = chCount(p);
+  const target = Math.round(perChapter(p)/K);
+  const beats = ch.beats || [];
+  const from = Math.floor(beats.length*(k-1)/K), to = Math.max(from+1, Math.floor(beats.length*k/K));
+  const myBeats = beats.slice(from, to);
+  const bible = {...plan, chapters: undefined, title_options: undefined};
+  const outline = plan.chapters.map((c,j)=>`${j+1}. ${c.title}: ${c.summary}${c.cliffhanger?` (ends on: ${c.cliffhanger})`:""}${j<i?" [written]":j===i?" [THIS ONE]":""}`).join("\n");
+  const recaps = p.parts.slice(0,i).map((x,j)=> x?.recap ? `Chapter ${j+1}: ${x.recap}` : "").filter(Boolean).join("\n");
+  const cur = p.parts[i]?.text || "";
+  const tailSrc = cur || (i>0 ? (p.parts[i-1]?.text||"") : "");
+  const tail = tailSrc ? cleanModelText(tailSrc).slice(-5000) : "";
+  const twistNote = N<2 ? "" : Number(plan.twist_chapter)===i+1 ? "\nThe twist is revealed in this chapter." : Number(plan.twist_chapter) > i+1 ? "\nDo not reveal the twist yet. Keep its clues visible but easy to misread." : "";
+  const last = k===K, finalCh = i===N-1;
+  let opening = "";
+  if(k>1) opening = "Continue directly from the text above, mid-scene if that's where it stopped. Don't recap and don't restart the scene.";
+  else if(i===0) opening = `Open with the hook: ${plan.hook||"a specific moment of trouble or oddness"}. The first paragraph must grab the reader; no background first.`;
+  else opening = `Open by picking up the previous chapter's cliffhanger (${plan.chapters[i-1]?.cliffhanger||"see the text above"}): show its consequence directly or after a short, tense delay. Never skip it, and don't repeat the last lines.`;
+  let ending;
+  if(!last) ending = "Stop at a natural paragraph break after the last beat. Don't wrap anything up.";
+  else if(finalCh) ending = "This is the ending. Land it in a concrete image or action, without explaining the twist back to the reader.";
+  else ending = `End the chapter on a heavy cliffhanger: ${ch.cliffhanger||"cut away at the worst or most revealing moment"}. Cut away in the middle of that moment, shown in action or dialogue, unresolved. The last line should make it impossible not to turn the page.`;
+  return `You are writing ${s.format==="book"?"a novel":"a story"} called "${plan.title}". Language: ${s.lang}.
+
+STORY BIBLE (for you only, never shown to the reader):
+${JSON.stringify(bible)}
+
+OUTLINE:
+${outline}
+${recaps ? `\nWHAT HAS ACTUALLY HAPPENED SO FAR (stay consistent with every detail):\n${recaps}\n` : ""}${tail ? `\nTHE TEXT JUST BEFORE WHERE YOU CONTINUE:\n"""${tail}"""\n` : ""}
+NOW WRITE: chapter ${i+1} of ${N}, "${ch.title}".
+What happens: ${ch.summary}
+Goal: ${ch.goal||""} · In the way: ${ch.obstacle||""} · Turn: ${ch.turn||""}
+${K>1 ? `This chapter is written in ${K} parts and you are writing part ${k} of ${K}, about ${fmtN(target)} words.` : `Length: about ${fmtN(target)} words.`}
+Cover these beats: ${myBeats.join(" | ")}
+${opening}
+${ending}${twistNote}
+Keep the character dynamics from the bible alive in every scene.
+
+${HOOK_RULES}
+
+${STYLE_RULES}
+
+Output only the prose, paragraphs separated by blank lines. No chapter number or title, no headings, no markdown, no notes before or after.`;
+}
+
+/* ---------- writing ---------- */
+async function writeChapter(p, i){
+  const K = segsFor(p), N = chCount(p);
+  p.parts[i] = p.parts[i] || {text:"", segDone:0, done:false, recap:""};
+  const part = p.parts[i];
+  if(current===p && !document.getElementById("ch-"+i)) render(p);
+  for(let k = part.segDone + 1; k <= K; k++){
+    const base = part.text, sep = base ? "\n\n" : "";
+    setStatus(`Writing chapter ${i+1} of ${N}${K>1?` · part ${k} of ${K}`:""}`,"busy");
+    setProgress((i + (k-1)/K) / N);
+    ctl = new AbortController();
+    try{
+      const r = await sample(segPrompt(p,i,k,K), { modelTier:p.settings.tier, cache:false, signal:ctl.signal,
+        onText:({text})=>{ part.text = base + sep + text; renderStreamingChapter(p,i); } });
+      part.text = base + sep + r.text;
+      part.segDone = k; storeSave(p,{chapters:[i]});
+    } catch(e){
+      if(e?.text){ part.text = base + sep + e.text; part.segDone = k; } else { part.text = base; }
+      storeSave(p,{chapters:[i]}); if(current===p) render(p); throw e;
+    }
+  }
+  part.done = true; storeSave(p,{chapters:[i]}); if(current===p) render(p);
+  setProgress((i+1)/N);
+  if(N > 1 && i < N-1){
+    setStatus(`Noting what happened in chapter ${i+1}`,"busy");
+    ctl = new AbortController();
+    try{
+      const r = await sample.json(`Here is a chapter from a novel. Reply with only JSON: {"recap":"under 120 words: what happened, in order, how the relationships between characters stand now, the exact cliffhanger it ends on, plus any new fixed facts (names, ages, places, objects, injuries, times, money) later chapters must respect"}
+
+"""${cleanModelText(part.text).slice(0,60000)}"""`, { modelTier:"quick", cache:false, signal:ctl.signal });
+      if(r && typeof r.recap==="string") { part.recap = r.recap; storeSave(p); }
+    } catch(e){ if(e?.code==="cancelled" || isFatal(e) || e?.code==="rate_limited") throw e; }
+  }
+}
+
+async function run(p, all){
+  setBusy(true);
+  try{
+    while(true){
+      const i = nextIndex(p);
+      if(i === null) break;
+      await writeChapter(p, i);
+      if(!all) break;
+    }
+    setProgress(isComplete(p) ? 1 : (p.parts.filter(x=>x?.done).length / chCount(p)));
+    setStatus(isComplete(p) ? `Finished · ${fmtN(totalWords(p))} words · saved to History` : `Chapter ${nextIndex(p)} done. Press "Write chapter ${nextIndex(p)+1}" when you're ready.`);
+  } catch(e){ failed(e); }
+  finally { setBusy(false); if(current===p) render(p); }
+}
+
+async function makeCover(p){
+  if(!sample || coverBusy.has(p.id) || !p.plan) return;
+  coverBusy.add(p.id); if(current===p) renderCover(p);
+  try{
+    const spec = await sample.json(coverPrompt(p), { modelTier: p.settings.tier || "default", cache:false });
+    const c = sanitizeCover(spec);
+    if(c){ p.cover = c; storeSave(p); }
+  } catch(e){
+    if(current===p && !busy) setStatus(e?.code==="invalid_json" ? "The cover design came back garbled. Try again." : errCopy(e), "err");
+    if(isFatal(e)) sample = null;
+  } finally { coverBusy.delete(p.id); if(current===p) renderCover(p); renderHistory(); }
+}
+$("newCover").addEventListener("click", ()=>{
+  const p = current; if(!p.plan || p.example) return;
+  if(p.cover?.photo && p.cover.paths){ p.cover.photo = false; storeSave(p); renderCover(p); if(p.cover.paths.length || p.cover.layout) { makeCover(p); return; } }
+  makeCover(p);
+});
+$("rmPhoto").addEventListener("click", ()=>{
+  const p = current; if(!p.cover) return;
+  p.cover.photo = false; p.coverImg = null; storeSave(p,{img:true}); renderCover(p);
+  if(!p.cover.paths.length) makeCover(p);
+});
+$("mkPrompt").addEventListener("click", async ()=>{
+  const p = current; if(!sample || !p.plan || p.example) return;
+  const key = "prompt:"+p.id; if(coverBusy.has(key)) return;
+  coverBusy.add(key); renderCover(p);
+  try{
+    const r = await sample.json(imagePromptRequest(p), { modelTier: p.settings.tier || "default", cache:false });
+    if(!r || typeof r.prompt!=="string") throw {code:"invalid_json"};
+    p.imgPrompt = { prompt:String(r.prompt), negative:String(r.negative||""), scene:String(r.scene||"") };
+    storeSave(p);
+  } catch(e){ setStatus(errCopy(e),"err"); if(isFatal(e)) sample = null; }
+  finally { coverBusy.delete(key); if(current===p) renderCover(p); }
+});
+document.querySelector("#promptOut").addEventListener("click", async e=>{
+  const b = e.target.closest("button[data-copy]"); if(!b) return;
+  const ta = $(b.dataset.copy);
+  try{ await navigator.clipboard.writeText(ta.value); b.textContent = "Copied"; }
+  catch{ ta.focus(); ta.select(); b.textContent = "Selected, press copy"; }
+  setTimeout(()=>b.textContent="Copy",1600);
+});
+$("upload").addEventListener("change", async e=>{
+  const file = e.target.files?.[0]; e.target.value = "";
+  const p = current; if(!file || p.example || !p.plan) return;
+  try{
+    const url = await new Promise((res,rej)=>{ const fr = new FileReader(); fr.onload=()=>res(fr.result); fr.onerror=rej; fr.readAsDataURL(file); });
+    const im = await loadImg(url);
+    const cv = document.createElement("canvas"); cv.width = 840; cv.height = 1260;
+    const c = cv.getContext("2d"); const r = Math.max(840/im.width, 1260/im.height);
+    c.drawImage(im, (840-im.width*r)/2, (1260-im.height*r)/2, im.width*r, im.height*r);
+    let q = .85, data = cv.toDataURL("image/jpeg", q);
+    while(data.length > 230000 && q > .4){ q -= .08; data = cv.toDataURL("image/jpeg", q); }
+    p.coverImg = data;
+    p.cover = p.cover || sanitizeCover({});
+    p.cover.photo = true;
+    await storeSave(p,{img:true});
+    renderCover(p); renderHistory(); setStatus("Your image is now the cover, with the title set on it");
+  } catch { setStatus("That image couldn't be read. Try a JPG or PNG.","err"); }
+});
+
+$("f").addEventListener("submit", async ev=>{
+  ev.preventDefault(); if(busy || !sample || !settingsValid()) return;
+  const s = readSettings();
+  const p = { id:"p"+Date.now().toString(36), settings:s, plan:null, cover:null, coverImg:null, imgPrompt:null, parts:[], created:Date.now(), updated:Date.now(), loaded:true };
+  setBusy(true); render(p);
+  setStatus("Planning the hook, characters, chapters and twist","busy"); setProgress(0);
+  ctl = new AbortController();
+  try{
+    const plan = await sample.json(planPrompt(s), { modelTier:s.tier, cache:false, signal:ctl.signal });
+    if(!plan || typeof plan!=="object" || !plan.twist || !Array.isArray(plan.chapters) || !plan.chapters.length) throw {code:"invalid_json"};
+    const str = v => v==null ? "" : String(v);
+    plan.chapters = plan.chapters.slice(0, s.chapters).map((c,i)=>({title:str(c?.title)||chapterLabel({settings:s},i), summary:str(c?.summary), goal:str(c?.goal), obstacle:str(c?.obstacle), turn:str(c?.turn), cliffhanger:str(c?.cliffhanger), beats:Array.isArray(c?.beats)?c.beats.map(String):[]}));
+    if(!plan.title) plan.title = (plan.title_options||[])[0] || "Untitled";
+    p.plan = plan; await storeSave(p);
+  } catch(e){ setBusy(false); failed(e); render(EXAMPLE); return; }
+  setBusy(false);
+  makeCover(p);  // runs alongside the writing
+  await run(p, s.delivery==="all" || s.chapters===1);
+});
+
+$("next").addEventListener("click", ()=>{ if(!busy && sample && current.plan) run(current, !isMulti(current)); });
+$("rest").addEventListener("click", ()=>{ if(!busy && sample && current.plan) run(current, true); });
+$("again").addEventListener("click", ()=>{
+  const p = current; if(busy || !sample || !p.plan) return;
+  let i = -1; p.parts.forEach((x,j)=>{ if(x?.text) i = j; });
+  if(i<0) return;
+  p.parts[i] = {text:"", segDone:0, done:false, recap:""};
+  p.parts.length = i+1;
+  render(p); run(p, false);
+});
+$("stop").addEventListener("click", ()=> ctl?.abort());
+
+$("clean").addEventListener("click", async ()=>{
+  const p = current; if(busy || !sample) return;
+  const sentences = [];
+  p.parts.forEach(part=>{
+    if(!part?.text) return;
+    (cleanModelText(part.text).match(/[^.!?\n]+[.!?]+["”’»]?|[^.!?\n]+$/g)||[]).forEach(sen=>{
+      const t = sen.trim();
+      if((t.match(FLAG_RE) || t.includes("—")) && !sentences.includes(t)) sentences.push(t);
+    });
+  });
+  if(!sentences.length) return;
+  setBusy(true); setProgress(null);
+  let changed = 0; const touched = new Set();
+  try{
+    for(let b=0; b<sentences.length; b+=40){
+      const batch = sentences.slice(b,b+40);
+      setStatus(`Rewriting flagged sentences ${b+1}–${b+batch.length} of ${sentences.length}`,"busy");
+      ctl = new AbortController();
+      const out = await sample.json(`You are a line editor. Each sentence below comes from a story in ${p.settings.lang}. Rewrite each one so it reads like a human novelist wrote it: remove stock phrases (${BANNED_WORDS.slice(0,30).join(", ")}, and similar), replace em dashes with commas, periods or parentheses, and replace any of these names (${BANNED_NAMES.join(", ")}) with a simple, natural name that fits the setting, using the same replacement every time. Keep the meaning, the tense, the voice, and roughly the same length.
+
+Reply with only a JSON array: [{"original":"exact sentence as given","rewrite":"new sentence"}]
+
+Sentences:
+${batch.map((x,i)=>`${i+1}. ${x}`).join("\n")}`, { modelTier:"default", cache:false, signal:ctl.signal });
+      if(Array.isArray(out)) out.forEach(o=>{
+        if(!o || typeof o.original!=="string" || typeof o.rewrite!=="string" || !o.original) return;
+        p.parts.forEach((part,j)=>{ if(!part?.text) return; const t = cleanModelText(part.text); if(t.includes(o.original)){ part.text = t.split(o.original).join(o.rewrite); changed++; touched.add(j); } });
+      });
+      await storeSave(p,{chapters:[...touched]});
+    }
+    setStatus(changed ? `Cleaned ${changed} sentence${changed>1?"s":""}` : "No sentences matched; nothing changed");
+  } catch(e){ failed(e); }
+  finally { setBusy(false); render(p); }
+});
+
+/* ---------- export: rich copy, .docx, web page ---------- */
+function coverJpeg(){ try{ return current.cover && !$("coverCv").hidden ? $("coverCv").toDataURL("image/jpeg",.88) : ""; } catch { return ""; } }
+function manuscriptText(p){
+  const plan = p.plan||{}, L = [];
+  L.push(kindLabel(p).toUpperCase(), "", plan.title||"Untitled", "", plan.logline||"", "", "");
+  if(isMulti(p)){ L.push(fr(p)?"TABLE DES MATIÈRES":"CONTENTS",""); plan.chapters.forEach((c,i)=>L.push(`${chapterLabel(p,i)}: ${c.title}`)); L.push("",""); }
+  p.parts.forEach((x,i)=>{ if(!x?.text) return; L.push(chapterLabel(p,i).toUpperCase(), plan.chapters?.[i]?.title||"", ""); L.push(paraList(x.text).join("\n\n"), "", ""); });
+  if(isComplete(p)) L.push(fr(p)?"FIN":"THE END");
+  return L.join("\n");
+}
+// HTML with inline styles that Google Docs, Word, Pages and Notion keep when pasted
+function richHtml(p, img){
+  const plan = p.plan||{}, F = "font-family:Georgia,'Times New Roman',serif;";
+  const PB = `<br style="page-break-before:always;mso-break-type:page-break" clear="all">`;
+  const out = [];
+  if(img) out.push(`<p style="text-align:center;margin:0"><img src="${img}" width="400" height="600" alt="Cover"></p>${PB}`);
+  out.push(`<p style="${F}text-align:center;font-size:10pt;letter-spacing:3px;color:#7a6a3a;margin:48pt 0 12pt">${escHtml(kindLabel(p).toUpperCase())}</p>`);
+  out.push(`<h1 style="${F}text-align:center;font-size:30pt;font-weight:bold;margin:0 0 12pt">${escHtml(plan.title||"Untitled")}</h1>`);
+  if(plan.logline) out.push(`<p style="${F}text-align:center;font-style:italic;font-size:13pt;color:#555;margin:0 0 24pt">${escHtml(plan.logline)}</p>`);
+  if(isMulti(p)){
+    out.push(PB, `<h2 style="${F}text-align:center;font-size:14pt;letter-spacing:2px;margin:24pt 0 12pt">${fr(p)?"TABLE DES MATIÈRES":"CONTENTS"}</h2>`);
+    plan.chapters.forEach((c,i)=>out.push(`<p style="${F}font-size:12pt;margin:0 0 6pt">${escHtml(chapterLabel(p,i))} · ${escHtml(c.title)}</p>`));
+  }
+  p.parts.forEach((x,i)=>{
+    if(!x?.text) return;
+    out.push(PB, `<p style="${F}text-align:center;font-size:10pt;letter-spacing:3px;color:#7a6a3a;margin:36pt 0 6pt">${escHtml(chapterLabel(p,i).toUpperCase())}</p>`);
+    out.push(`<h2 style="${F}text-align:center;font-size:20pt;font-weight:bold;margin:0 0 24pt">${escHtml(plan.chapters?.[i]?.title||"")}</h2>`);
+    let first = true;
+    for(const para of paraList(x.text)){
+      if(para==="* * *"){ out.push(`<p style="${F}text-align:center;font-size:12pt;margin:12pt 0">*&nbsp;&nbsp;*&nbsp;&nbsp;*</p>`); first = true; continue; }
+      out.push(`<p style="${F}font-size:12pt;line-height:1.6;margin:0;text-align:justify;text-indent:${first?"0":"0.3in"}">${escHtml(para)}</p>`);
+      first = false;
+    }
+  });
+  if(isComplete(p)) out.push(`<p style="${F}text-align:center;font-size:10pt;letter-spacing:4px;color:#777;margin:36pt 0">${fr(p)?"FIN":"THE END"}</p>`);
+  return `<div>${out.join("")}</div>`;
+}
+$("copy").addEventListener("click", ()=>{
+  const html = richHtml(current, coverJpeg()), text = manuscriptText(current);
+  let ok = false;
+  const onCopy = ev => { ev.clipboardData.setData("text/html", html); ev.clipboardData.setData("text/plain", text); ev.preventDefault(); ok = true; };
+  document.addEventListener("copy", onCopy, {once:true});
+  try{ document.execCommand("copy"); }catch{}
+  document.removeEventListener("copy", onCopy);
+  const done = ()=>{ $("copy").textContent = "Copied with layout"; setStatus("Copied. Paste into Google Docs, Word, Pages or Notion and the headings, chapters and page breaks come along."); setTimeout(()=>$("copy").textContent="Copy with layout",2000); };
+  if(ok){ done(); return; }
+  if(window.ClipboardItem && navigator.clipboard?.write){
+    navigator.clipboard.write([new ClipboardItem({"text/html":new Blob([html],{type:"text/html"}),"text/plain":new Blob([text],{type:"text/plain"})})]).then(done)
+      .catch(()=>setStatus("Copying isn't allowed here. Use Download Word (.docx) and open it in Google Docs or Word.","err"));
+  } else setStatus("Copying isn't allowed here. Use Download Word (.docx) and open it in Google Docs or Word.","err");
+});
+
+/* minimal .docx writer (stored zip, no compression) */
+const CRC = (()=>{ const t = new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u8){ let c = 0xFFFFFFFF; for(let i=0;i<u8.length;i++) c = CRC[(c^u8[i])&0xFF]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zip(files){
+  const enc = new TextEncoder(), chunks = [], central = []; let offset = 0;
+  for(const f of files){
+    const name = enc.encode(f.name), data = typeof f.data==="string" ? enc.encode(f.data) : f.data, crc = crc32(data);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true); h.setUint16(4,20,true); h.setUint16(6,0x0800,true); h.setUint16(8,0,true); h.setUint16(10,0,true); h.setUint16(12,0x21,true);
+    h.setUint32(14,crc,true); h.setUint32(18,data.length,true); h.setUint32(22,data.length,true); h.setUint16(26,name.length,true); h.setUint16(28,0,true);
+    chunks.push(new Uint8Array(h.buffer), name, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0,0x02014b50,true); c.setUint16(4,20,true); c.setUint16(6,20,true); c.setUint16(8,0x0800,true); c.setUint16(10,0,true); c.setUint16(12,0,true); c.setUint16(14,0x21,true);
+    c.setUint32(16,crc,true); c.setUint32(20,data.length,true); c.setUint32(24,data.length,true); c.setUint16(28,name.length,true); c.setUint32(42,offset,true);
+    central.push(new Uint8Array(c.buffer), name);
+    offset += 30 + name.length + data.length;
+  }
+  const cdSize = central.reduce((a,x)=>a+x.length,0);
+  const e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true); e.setUint16(8,files.length,true); e.setUint16(10,files.length,true); e.setUint32(12,cdSize,true); e.setUint32(16,offset,true);
+  return new Blob([...chunks, ...central, new Uint8Array(e.buffer)], {type:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+}
+const xe = s => String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+async function buildDocx(p){
+  const plan = p.plan||{}, imgUrl = coverJpeg();
+  let imgBytes = null;
+  if(imgUrl){ const b = atob(imgUrl.split(",")[1]); imgBytes = new Uint8Array(b.length); for(let i=0;i<b.length;i++) imgBytes[i]=b.charCodeAt(i); }
+  const para = (style, text, extra="") => `<w:p><w:pPr><w:pStyle w:val="${style}"/>${extra}</w:pPr><w:r><w:t xml:space="preserve">${xe(text)}</w:t></w:r></w:p>`;
+  const pageBreak = `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+  const body = [];
+  if(imgBytes){
+    body.push(`<w:p><w:pPr><w:jc w:val="center"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="3840480" cy="5760720"/><wp:docPr id="1" name="Cover"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="1" name="cover.jpeg"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdImg"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="3840480" cy="5760720"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`, pageBreak);
+  }
+  body.push(para("Kicker", kindLabel(p).toUpperCase(), `<w:spacing w:before="2400"/>`), para("Title", plan.title||"Untitled"));
+  if(plan.logline) body.push(para("Subtitle", plan.logline));
+  if(isMulti(p)){
+    body.push(pageBreak, para("TOCHeading", fr(p)?"Table des matières":"Contents"));
+    plan.chapters.forEach((c,i)=>body.push(para("TOCLine", `${chapterLabel(p,i)} · ${c.title}`)));
+  }
+  p.parts.forEach((x,i)=>{
+    if(!x?.text) return;
+    body.push(para("Kicker", chapterLabel(p,i).toUpperCase(), `<w:pageBreakBefore/><w:spacing w:before="1440"/>`), para("Heading1", plan.chapters?.[i]?.title||""));
+    let first = true;
+    for(const t of paraList(x.text)){
+      if(t==="* * *"){ body.push(para("SceneBreak","*   *   *")); first = true; continue; }
+      body.push(para(first?"FirstParagraph":"Normal", t)); first = false;
+    }
+  });
+  if(isComplete(p)) body.push(para("Kicker", fr(p)?"FIN":"THE END", `<w:spacing w:before="720"/>`));
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body.join("")}<w:sectPr><w:pgSz w:w="8640" w:h="12960"/><w:pgMar w:top="1080" w:right="1008" w:bottom="1080" w:left="1152" w:header="576" w:footer="576" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia" w:cs="Georgia" w:eastAsia="Georgia"/><w:sz w:val="23"/><w:lang w:val="${fr(p)?"fr-FR":"en-GB"}"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="324" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:firstLine="360"/><w:jc w:val="both"/></w:pPr></w:style>
+<w:style w:type="paragraph" w:styleId="FirstParagraph"><w:name w:val="First Paragraph"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:firstLine="0"/></w:pPr></w:style>
+<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:jc w:val="center"/><w:ind w:firstLine="0"/><w:spacing w:before="120" w:after="240" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/><w:sz w:val="60"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Subtitle"><w:name w:val="Subtitle"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:jc w:val="center"/><w:ind w:firstLine="0"/></w:pPr><w:rPr><w:i/><w:color w:val="555555"/><w:sz w:val="26"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Kicker"><w:name w:val="Chapter Number"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:jc w:val="center"/><w:ind w:firstLine="0"/><w:spacing w:after="120"/></w:pPr><w:rPr><w:caps/><w:spacing w:val="40"/><w:color w:val="7A6A3A"/><w:sz w:val="18"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="FirstParagraph"/><w:qFormat/><w:pPr><w:keepNext/><w:jc w:val="center"/><w:ind w:firstLine="0"/><w:spacing w:after="480" w:line="240" w:lineRule="auto"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="36"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="TOCHeading"><w:name w:val="TOC Heading"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:jc w:val="center"/><w:ind w:firstLine="0"/><w:spacing w:before="1440" w:after="360"/></w:pPr><w:rPr><w:caps/><w:spacing w:val="40"/><w:sz w:val="22"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="TOCLine"><w:name w:val="TOC Line"/><w:basedOn w:val="Normal"/><w:pPr><w:ind w:firstLine="0"/><w:jc w:val="left"/><w:spacing w:after="80"/></w:pPr></w:style>
+<w:style w:type="paragraph" w:styleId="SceneBreak"><w:name w:val="Scene Break"/><w:basedOn w:val="Normal"/><w:pPr><w:jc w:val="center"/><w:ind w:firstLine="0"/><w:spacing w:before="240" w:after="240"/></w:pPr></w:style>
+</w:styles>`;
+  const files = [
+    {name:"[Content_Types].xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="jpeg" ContentType="image/jpeg"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`},
+    {name:"_rels/.rels", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`},
+    {name:"docProps/core.xml", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>${xe(plan.title||"Untitled")}</dc:title></cp:coreProperties>`},
+    {name:"word/_rels/document.xml.rels", data:`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>${imgBytes?`<Relationship Id="rIdImg" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/cover.jpeg"/>`:""}</Relationships>`},
+    {name:"word/document.xml", data:doc},
+    {name:"word/styles.xml", data:styles}
+  ];
+  if(imgBytes) files.push({name:"word/media/cover.jpeg", data:imgBytes});
+  return zip(files);
+}
+function manuscriptHtml(p){
+  return `<!doctype html><html lang="${fr(p)?"fr":"en"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(p.plan?.title||"Untitled")}</title>
+<style>body{margin:0;background:#fbfaf7;color:#1c1c1a;padding:40px 20px}main{max-width:34em;margin:0 auto}img{max-width:100%;height:auto}</style></head><body><main>${richHtml(p, coverJpeg())}</main></body></html>`;
+}
+$("dlDocx").addEventListener("click", async ()=>{
+  if(!downloads) return;
+  try{
+    const blob = await buildDocx(current);
+    await downloads.save({filename: slugOf(current)+".docx", data: blob});
+    setStatus("Saved as a Word file. Open it in Word or upload it to Google Docs; chapters show up as headings.");
+  } catch(e){
+    if(e?.code==="declined") return;
+    if(e?.code==="rejected_extension" || e?.code==="extension_not_enabled") setStatus("Word files can't be saved from this view. Use Copy with layout and paste into Google Docs or Word.","err");
+    else setStatus("The download didn't go through. Use Copy with layout instead.","err");
+  }
+});
+$("dl").addEventListener("click", async ()=>{
+  if(!downloads) return;
+  const slug = slugOf(current);
+  try{ await downloads.save({filename: slug+".html", data: manuscriptHtml(current)}); setStatus("Saved as a web page you can open in any browser"); }
+  catch(e){
+    if(e?.code==="rejected_extension" || e?.code==="extension_not_enabled"){
+      try{ await downloads.save({filename: slug+".txt", data: manuscriptText(current)}); setStatus("Saved as plain text"); } catch(e2){ if(e2?.code!=="declined") setStatus("The download didn't go through. Use Copy with layout instead.","err"); }
+    } else if(e?.code!=="declined") setStatus("The download didn't go through. Use Copy with layout instead.","err");
+  }
+});
+$("dlCover").addEventListener("click", ()=>{
+  if(!downloads || !current.cover) return;
+  $("coverCv").toBlob(async blob=>{
+    if(!blob) return;
+    try{ await downloads.save({filename: slugOf(current)+"-cover.png", data: blob}); setStatus("Cover saved"); }
+    catch(e){ if(e?.code!=="declined") setStatus("The cover download didn't go through.","err"); }
+  }, "image/png");
+});
+
+/* ---------- boot ---------- */
+updateCalc(); render(EXAMPLE);
+storeInit();
+(async ()=>{
+  try { downloads = await window.claude?.use?.("downloads"); } catch { downloads = null; }
+  updateTools(); renderCover(current);
+})();
+(async ()=>{
+  try { sample = await window.claude?.use?.("sample"); } catch { sample = null; }
+  if(!sample) $("avail").textContent = "Writing is unavailable right now. You can still read the example and your history.";
+  updateTools(); renderCover(current);
+})();
+})();
+</script>
+
+</body>
+</html>
