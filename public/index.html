@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Twistwell writes stories and novels with a strong hook, real characters, cliffhangers and a fair twist, then lays them out like a real book with a cover.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F5F5B'/%3E%3Cpath d='M9 7h11a3 3 0 0 1 3 3v15H12a3 3 0 0 1-3-3z' fill='%23F1E3BF'/%3E%3Cpath d='M12 11h8M12 15h8M12 19h5' stroke='%239C711A' stroke-width='1.6'/%3E%3C/svg%3E">
-<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
-#accessBar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding:10px 16px;background:#F1E3BF;color:#1C2321;font:14px system-ui,sans-serif}
-#accessBar input{padding:6px 8px;border:1px solid #9C711A;border-radius:6px}#accessBar button{padding:6px 12px;border-radius:6px;border:0;background:#1F5F5B;color:#fff;cursor:pointer}</style>
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="https://js.puter.com/v2/"></script>
 <script src="shim.js"></script>
 <title>Twistwell</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -278,7 +277,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
       <div class="actions">
         <button class="btn primary" id="go" type="submit">Plan and write</button>
       </div>
-      <p class="note" id="avail">Free to use. A long book takes a few minutes to write; keep this tab open.</p>
+      <p class="note" id="avail">Writing runs on Puter: the first time, sign in or create a free Puter account. Your use goes on your own Puter account, so this site stays free.</p>
     </form>
     </div>
 
@@ -704,6 +703,9 @@ While we waited, the woman sat on the step and counted coins from the rubber ban
 I kept them. Dina says that's sentimental. I told her it was the correct price for a job I wasn't supposed to do.`}]
 };
 
+// start on a clean welcome page instead of a sample story
+EXAMPLE.plan = null; EXAMPLE.parts = []; EXAMPLE.cover = null;
+
 /* ---------- history storage: account (db) when available, this browser otherwise ---------- */
 const LS = "twistwell.history.v4";
 let db = null, uid = null;
@@ -732,7 +734,14 @@ async function storeSave(p, opts={}){
     jobs.push(queued(`c_${p.id}_${i}`, ()=>col.doc(`c_${p.id}_${i}`).set({kind:"chapter", pid:p.id, i, text:x.text||""}))); }
   if(opts.img) jobs.push(queued("i_"+p.id, ()=> p.coverImg ? col.doc("i_"+p.id).set({kind:"image", pid:p.id, data:p.coverImg}) : col.doc("i_"+p.id).delete()));
   try{ await Promise.all(jobs); }
-  catch(e){ setStatus(e?.code==="quota_exceeded" ? "Your history storage is full. Delete some old stories to keep saving." : "Couldn't save to your history just now. It will retry on the next change.","err"); }
+  catch(e){
+    if(e?.code==="invalid_argument" || e?.code==="revoked" || e?.code==="not_granted"){
+      // this visitor can't save to the account store: keep their history in this browser instead
+      db = null; history.forEach(x=>{ if(!x.loaded) x.loaded = true; }); lsSave();
+      $("hnote").textContent = "Saved in this browser only.";
+      return;
+    }
+    setStatus(e?.code==="quota_exceeded" ? "Your history storage is full. Delete some old stories to keep saving." : "Couldn't save to your history just now. It will retry on the next change.","err"); }
 }
 async function storeLoad(p){
   if(p.loaded || !db) { p.loaded = true; return; }
@@ -767,7 +776,8 @@ async function storeInit(){
   try{
     const [d, u] = await Promise.all([window.claude?.use?.("db"), window.claude?.use?.("user")]);
     const id = await u?.id?.();
-    if(d && id){ db = d; uid = id; }
+    const canWrite = await u?.can?.("data.write").catch(()=>null);
+    if(d && id && canWrite !== false){ db = d; uid = id; }
   }catch{ db = null; }
   if(db){
     try{
@@ -854,8 +864,8 @@ function render(p){
   current = p;
   const plan = p.plan || {}, s = p.settings;
   $("kind").textContent = kindLabel(p);
-  $("title").textContent = plan.title || (busy ? (fr(p)?"Préparation…":"Planning…") : "Untitled");
-  $("logline").textContent = plan.logline || "";
+  $("title").textContent = plan.title || (busy ? (fr(p)?"Préparation…":"Planning…") : p.example ? "Your story starts here" : "Untitled");
+  $("logline").textContent = plan.logline || (p.example && !busy ? "Pick a format, a genre and a twist on the left, then press the green button. The plan, the cover and every chapter appear here as they're written." : "");
   const tw = totalWords(p);
   const chips = [];
   if(p.example) chips.push(`<span class="chip ex">Example</span>`);
@@ -863,7 +873,8 @@ function render(p){
   if(plan.chapters) chips.push(`<span class="chip">${chCount(p)} ${chCount(p)>1?"chapters":"chapter"}</span>`);
   chips.push(`<span class="chip">${fmtN(tw)} / ${fmtN(s.words)} words</span>`);
   if(tw) chips.push(`<span class="chip">${Math.max(1,Math.round(tw/230))} min read</span>`);
-  $("chips").innerHTML = chips.join("");
+  $("chips").innerHTML = p.example && !p.plan ? "" : chips.join("");
+  $("kind").hidden = p.example && !p.plan;
   renderPlan(p);
   renderCover(p);
 
@@ -939,7 +950,7 @@ function renderHistory(){
         <span class="st ${complete?"done":"wip"}">${complete?"Finished":"In progress"}</span></button>
       <button class="del" type="button" aria-label="Delete from history">delete</button></li>`;
   }).join("");
-  $("hlist").innerHTML = rows + `<li data-id="example" class="${current===EXAMPLE?"active":""}"><span class="sw" style="background:linear-gradient(#2E3B3A,#151D1D);color:#C9A24A" aria-hidden="true">T</span><button class="open" type="button"><span class="t">Twenty Escudos</span><span class="m">Example story</span></button><span></span></li>`;
+  $("hlist").innerHTML = rows + (!EXAMPLE.plan ? "" : `<li data-id="example" class="${current===EXAMPLE?"active":""}"><span class="sw" style="background:linear-gradient(#2E3B3A,#151D1D);color:#C9A24A" aria-hidden="true">T</span><button class="open" type="button"><span class="t">Twenty Escudos</span><span class="m">Example story</span></button><span></span></li>`);
   if(!history.length && !q) $("hlist").insertAdjacentHTML("afterbegin", `<li style="display:block"><p class="hempty">Nothing written yet. Everything you write lands here automatically.</p></li>`);
   else if(!items.length) $("hlist").insertAdjacentHTML("afterbegin", `<li style="display:block"><p class="hempty">No matches.</p></li>`);
 }
@@ -978,9 +989,9 @@ function errCopy(e){
   switch(e?.code){
     case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed":
       return "Claude isn't allowed for this page in this view, so writing is off.";
-    case "no_key": return "This site isn't set up yet: the owner needs to add the Anthropic API key on Netlify.";
-    case "no_credit": return "The writing service is out of credit. The site owner needs to top up the Anthropic account.";
-    case "access_code": return "Enter the access code at the top of the page, then try again.";
+    case "no_credit": return "Your Puter allowance is used up. Add credit on puter.com or try again later. Nothing written is lost.";
+    case "not_signed_in": return "Sign in to Puter to write. Press the button again and a sign-in window opens (a free account takes a few seconds).";
+    case "no_puter": return "The writing service didn't load. Check your connection and reload the page.";
     case "rate_limited": return "Usage limit or too many requests. Wait a while, then press Continue. Nothing written is lost.";
     case "session_expired": return "Your Claude session expired. Sign in again, then press Continue.";
     case "refused": return "Claude declined this request. Change the premise and try again.";
@@ -1514,7 +1525,7 @@ storeInit();
 })();
 (async ()=>{
   try { sample = await window.claude?.use?.("sample"); } catch { sample = null; }
-  if(!sample) $("avail").textContent = "Writing is unavailable right now. You can still read the example and your history.";
+  if(!sample) $("avail").textContent = "The writing service didn't load. Check your connection and reload the page.";
   updateTools(); renderCover(current);
 })();
 })();
