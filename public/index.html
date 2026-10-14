@@ -270,7 +270,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
         </div>
         <div class="field">
           <label class="label" for="tier">Quality</label>
-          <select id="tier"><option value="complex" selected>Best (slower, more natural prose)</option><option value="default">Standard (faster)</option></select>
+          <select id="tier"><option value="default" selected>Standard (uses less Puter credit)</option><option value="complex">Best (richer prose, uses much more credit)</option></select>
         </div>
       </fieldset>
 
@@ -989,7 +989,7 @@ function errCopy(e){
   switch(e?.code){
     case "not_granted": case "sampling_disabled": case "not_declared": case "capability_disabled": case "capability_removed":
       return "Claude isn't allowed for this page in this view, so writing is off.";
-    case "no_credit": return "Your Puter allowance is used up. Add credit on puter.com or try again later. Nothing written is lost.";
+    case "no_credit": return "Your free Puter credit is used up. Add credit in the Puter window (Upgrade), then press the button again to continue. Nothing written is lost.";
     case "not_signed_in": return "Sign in to Puter to write. Press the button again and a sign-in window opens (a free account takes a few seconds).";
     case "no_puter": return "The writing service didn't load. Check your connection and reload the page.";
     case "rate_limited": return "Usage limit or too many requests. Wait a while, then press Continue. Nothing written is lost.";
@@ -1195,7 +1195,8 @@ async function writeChapter(p, i){
       part.segDone = k; storeSave(p,{chapters:[i]});
     } catch(e){
       if(e?.text){ part.text = base + sep + e.text; part.segDone = k; } else { part.text = base; }
-      storeSave(p,{chapters:[i]}); if(current===p) render(p); throw e;
+      if(!part.text){ p.parts[i] = undefined; while(p.parts.length && !p.parts[p.parts.length-1]) p.parts.pop(); }  // nothing written: don't leave a stuck "Writing…" chapter
+      storeSave(p,{chapters:p.parts[i]?[i]:[]}); if(current===p) render(p); throw e;
     }
   }
   part.done = true; storeSave(p,{chapters:[i]}); if(current===p) render(p);

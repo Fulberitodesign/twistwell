@@ -17,8 +17,10 @@
   }
 
   function classify(err) {
-    const m = String(err?.message || err?.error?.message || err?.error || err || "");
-    if (/insufficient|funds|balance|credit|quota|limit reached|usage limit|payment/i.test(m)) return { code: "no_credit", message: m };
+    let raw = "";
+    try { raw = typeof err === "string" ? err : JSON.stringify(err); } catch {}
+    const m = [err?.message, err?.error?.message, err?.error?.code, err?.code, typeof err?.error === "string" ? err.error : "", raw].filter(Boolean).join(" ");
+    if (/insufficient|funds|funding|balance|credit|quota|limit reached|usage limit|payment|upgrade/i.test(m)) return { code: "no_credit", message: m };
     if (/rate|too many|overloaded|busy/i.test(m)) return { code: "rate_limited", message: m };
     if (/sign ?in|auth|login|unauthori[sz]ed|401/i.test(m)) return { code: "not_signed_in", message: m };
     if (/too long|too large|context|token/i.test(m)) return { code: "prompt_too_large", message: m };
