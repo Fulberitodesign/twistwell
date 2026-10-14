@@ -1,11 +1,12 @@
 # Twistwell
 
-Twistwell writes stories and novels built around a strong hook, clear character dynamics, chapter cliffhangers and a fair twist. Every chapter has a number and a title, and the result is laid out like a real book with a cover. You can export it to Word or paste it into Google Docs with the layout intact.
+Twistwell writes stories and novels told in the first person ("I"), built around a strong hook, clear character dynamics, chapter cliffhangers and a fair twist. Every chapter has a number and a title, and the result is laid out like a real book with a cover. You can export it to Word or paste it into Google Docs with the layout intact.
 
 ## How it works
 
 - `public/` holds the website: `index.html` is the app and `shim.js` connects it to the server.
 - `netlify/edge-functions/write.js` sends writing requests to the Anthropic API and streams the text back. The API key stays on Netlify and never reaches the browser.
+- "Make it mine": paste or import a story (.txt, .md, .docx) and it is rewritten as the narrator's own first-person story, with every pronoun and verb fixed.
 - History is saved in each visitor's own browser.
 
 ## Settings (Netlify → Site configuration → Environment variables)

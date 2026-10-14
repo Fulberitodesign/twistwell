@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Twistwell writes stories and novels with a strong hook, real characters, cliffhangers and a fair twist, then lays them out like a real book with a cover.">
+<meta name="description" content="Twistwell writes stories and novels told in the first person, with a strong hook, real characters, cliffhangers and a fair twist, and turns any story into your own. Laid out like a real book with a cover.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231F5F5B'/%3E%3Cpath d='M9 7h11a3 3 0 0 1 3 3v15H12a3 3 0 0 1-3-3z' fill='%23F1E3BF'/%3E%3Cpath d='M12 11h8M12 15h8M12 19h5' stroke='%239C711A' stroke-width='1.6'/%3E%3C/svg%3E">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}
 #accessBar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;padding:10px 16px;background:#F1E3BF;color:#1C2321;font:14px system-ui,sans-serif}
@@ -41,7 +41,7 @@ header.brand{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;g
 
 .label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 aside{display:flex;flex-direction:column;gap:22px;min-width:0}
-.tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--line)}
 .tabs button{background:none;border:0;border-bottom:2px solid transparent;padding:10px 4px;font:inherit;font-size:15px;font-weight:500;color:var(--muted);cursor:pointer;margin-bottom:-1px}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .tabs .count{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:4px}
@@ -51,7 +51,7 @@ fieldset+fieldset{border-top:1px solid var(--line);padding-top:16px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .row3{display:grid;grid-template-columns:.8fr 1fr 1.2fr;gap:10px}
-select,textarea,input[type=number],input[type=search]{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
+select,textarea,input[type=number],input[type=search],input[type=text]{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
 input[type=number]{font-variant-numeric:tabular-nums}
 input#words{background:var(--brass-soft);border-color:var(--brass)}
 textarea{resize:vertical;min-height:84px;font-family:var(--prose);font-size:14px;line-height:1.5}
@@ -83,6 +83,10 @@ select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-vis
 .btn:disabled{opacity:.5;cursor:not-allowed}
 .btn.small{font-size:13px;padding:6px 11px}
 .note{font-size:13px;color:var(--muted);margin:0}
+textarea.big{min-height:220px}
+label.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;cursor:pointer}
+label.check input{margin-top:3px;width:16px;height:16px;accent-color:var(--accent);flex:none}
+.tabs .tsub{display:block;font-size:11px;font-weight:400;color:var(--muted)}
 
 /* history */
 .history{display:flex;flex-direction:column;gap:12px}
@@ -188,12 +192,13 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
 <div class="wrap">
   <header class="brand">
     <h1>Twist<span>well</span></h1>
-    <p>Stories and books built around a strong hook and a fair twist, written in plain human prose, with a cover and a real book layout.</p>
+    <p>Stories and books told in your own voice, “I”, with a strong hook and a fair twist. Or paste any story and make it yours. With a cover and a real book layout.</p>
   </header>
 
   <aside>
     <div class="tabs" role="tablist">
       <button type="button" role="tab" id="tab-write" aria-selected="true" aria-controls="pane-write">New</button>
+      <button type="button" role="tab" id="tab-import" aria-selected="false" aria-controls="pane-import">Make it mine</button>
       <button type="button" role="tab" id="tab-hist" aria-selected="false" aria-controls="pane-hist">History<span class="count" id="hcount"></span></button>
     </div>
 
@@ -259,19 +264,26 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
           <div class="ideas" id="ideas" hidden></div>
         </div>
 
+        <p class="note">Every story is told by “I”, from the inside, as if you lived it.</p>
         <div class="row2">
           <div class="field">
-            <label class="label" for="pov">Point of view</label>
-            <select id="pov"><option value="">Writer's choice</option><option>First person</option><option>Close third person</option><option>Second person</option></select>
+            <label class="label" for="pov">Who is “I”</label>
+            <input type="text" id="pov" placeholder="Writer's choice" autocomplete="off">
           </div>
+          <div class="field">
+            <label class="label" for="gender">Narrator is</label>
+            <select id="gender"><option value="">Writer's choice</option><option>a man</option><option>a woman</option></select>
+          </div>
+        </div>
+        <div class="row2">
           <div class="field">
             <label class="label" for="lang">Language</label>
             <select id="lang"><option>English</option><option>Français</option></select>
           </div>
-        </div>
-        <div class="field">
-          <label class="label" for="tier">Quality</label>
-          <select id="tier"><option value="default" selected>Standard (fast, natural prose)</option><option value="complex">Best (slower, richest prose)</option></select>
+          <div class="field">
+            <label class="label" for="tier">Quality</label>
+            <select id="tier"><option value="default" selected>Standard (fast, natural prose)</option><option value="complex">Best (slower, richest prose)</option></select>
+          </div>
         </div>
       </fieldset>
 
@@ -279,6 +291,48 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
         <button class="btn primary" id="go" type="submit">Plan and write</button>
       </div>
       <p class="note" id="avail">Free to use, no account needed. A long book takes a few minutes to write; keep this tab open.</p>
+    </form>
+    </div>
+
+    <div id="pane-import" role="tabpanel" aria-labelledby="tab-import" hidden>
+    <form id="fi" novalidate>
+      <fieldset>
+        <p class="note">Paste a story or import a file. Twistwell rewrites it as your own story: the main character becomes “I”, every pronoun and verb is corrected, and the voice comes from the inside. The events stay the same.</p>
+        <div class="field">
+          <div class="premise-head">
+            <label class="label" for="srcText">The story</label>
+            <label class="upload" id="srcFileLbl">Import a file<input type="file" id="srcFile" accept=".txt,.md,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
+          </div>
+          <textarea id="srcText" class="big" placeholder="Paste the story here. Headings like “Chapter 1” or “Chapitre 2” are kept as chapters."></textarea>
+          <p class="calc" id="srcCount">Text (.txt), Markdown (.md) and Word (.docx) files work.</p>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="label" for="impNarrator">Who becomes “I”</label>
+            <input type="text" id="impNarrator" placeholder="Main character (auto)" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="label" for="impGender">Narrator is</label>
+            <select id="impGender"><option value="">Auto</option><option>a man</option><option>a woman</option></select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="label" for="impTitle">Title (optional)</label>
+            <input type="text" id="impTitle" placeholder="Keep or invent one" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="label" for="impLang">Language</label>
+            <select id="impLang"><option value="">Same as the text</option><option>English</option><option>Français</option></select>
+          </div>
+        </div>
+        <label class="check"><input type="checkbox" id="impDeep" checked><span>Deepen my inner voice: add my thoughts, memories and feelings, without changing what happens</span></label>
+        <div class="field">
+          <label class="label" for="impTier">Quality</label>
+          <select id="impTier"><option value="default" selected>Standard (fast)</option><option value="complex">Best (slower, richest prose)</option></select>
+        </div>
+      </fieldset>
+      <div class="actions"><button class="btn primary" id="impGo" type="submit">Make it my story</button></div>
     </form>
     </div>
 
@@ -389,6 +443,20 @@ const STYLE_RULES = `How to write it:
 - Never use these words or phrases: ${BANNED_WORDS.join(", ")}, "little did they know", "a shiver down her spine", "a breath she didn't know she was holding", "somewhere, a dog barked".
 - Mark a scene change inside a chapter with a line containing only * * *
 - Humor, if any, comes from character and situation, never from the narrator winking at the reader.`;
+
+function voiceRules(s){
+  const fr = (s.lang||"") === "Français";
+  const who = s.pov ? `The narrator, "I", is ${s.pov}.` : `The narrator, "I", is the main character.`;
+  const g = s.gender==="a woman" ? (fr ? " The narrator is a woman: in French, past participles and adjectives about her agree in the feminine (je suis allée, je me suis sentie)." : " The narrator is a woman.")
+          : s.gender==="a man" ? (fr ? " The narrator is a man: masculine agreement in French (je suis allé, je me suis senti)." : " The narrator is a man.") : "";
+  return `Voice: the whole story is told in the first person ("I"${fr?', in French "je"':''}), by someone who lived it and is telling it from the inside. ${who}${g}
+- Never use second-person narration and never address the reader as "you".
+- It must feel like it comes from deep inside the narrator: what I think, remember and feel in my body as things happen (a tight throat, cold hands, a smell that brings back a whole year of my life). Short, honest interior thoughts, including the petty, ashamed or contradictory ones people really have.
+- Memories surface naturally, set off by an object, a word or a place, then the story moves on.
+- I only know what I saw, heard, was told or can guess. Other people's minds are read through their faces, hands and silences.
+- Admissions and private details a person would only write down for themselves.
+- Still show more than tell: no speeches about feelings, no lessons, no melodrama.`;
+}
 
 const TWIST_RULES = `The twist must play fair:
 - It recontextualizes scenes the reader has already read. It is never a brand-new fact dropped at the end.
@@ -713,7 +781,7 @@ let db = null, uid = null;
 let history = [];   // project objects; chapter text may be unloaded (loaded:false)
 const writeChains = new Map();
 function queued(path, fn){ const prev = writeChains.get(path) || Promise.resolve(); const next = prev.catch(()=>{}).then(fn); writeChains.set(path, next); return next; }
-const metaOf = p => ({ kind:"project", id:p.id, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, hasImg:!!p.coverImg,
+const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, hasImg:!!p.coverImg,
   parts:p.parts.map(x=>x?({done:!!x.done,segDone:x.segDone||0,recap:x.recap||"",words:partWords(x)}):null), created:p.created, updated:p.updated });
 function lsSave(){
   try{
@@ -733,6 +801,7 @@ async function storeSave(p, opts={}){
   const jobs = [queued("p_"+p.id, ()=>col.doc("p_"+p.id).set(JSON.parse(JSON.stringify(metaOf(p)))))];
   for(const i of (opts.chapters||[])){ const x = p.parts[i]; if(!x) continue;
     jobs.push(queued(`c_${p.id}_${i}`, ()=>col.doc(`c_${p.id}_${i}`).set({kind:"chapter", pid:p.id, i, text:x.text||""}))); }
+  if(opts.src) p.parts.forEach((x,i)=>{ if(x?.src) jobs.push(queued(`s_${p.id}_${i}`, ()=>col.doc(`s_${p.id}_${i}`).set({kind:"source", pid:p.id, i, text:x.src}))); });
   if(opts.img) jobs.push(queued("i_"+p.id, ()=> p.coverImg ? col.doc("i_"+p.id).set({kind:"image", pid:p.id, data:p.coverImg}) : col.doc("i_"+p.id).delete()));
   try{ await Promise.all(jobs); }
   catch(e){
@@ -751,6 +820,10 @@ async function storeLoad(p){
   const snaps = await Promise.all([...Array.from({length:n},(_,i)=>col.doc(`c_${p.id}_${i}`).get()), p.hasImg ? col.doc("i_"+p.id).get() : Promise.resolve(null)]);
   for(let i=0;i<n;i++){ const d = snaps[i]?.exists ? snaps[i].data() : null; if(p.parts[i]) p.parts[i].text = d?.text || ""; }
   const im = snaps[n]; if(im?.exists) p.coverImg = im.data().data || null;
+  if(p.import){
+    const src = await Promise.all(Array.from({length:n},(_,i)=>col.doc(`s_${p.id}_${i}`).get()));
+    src.forEach((d,i)=>{ if(p.parts[i] && d?.exists) p.parts[i].src = d.data().text || ""; });
+  }
   p.loaded = true;
 }
 async function storeDelete(p){
@@ -759,11 +832,11 @@ async function storeDelete(p){
   if(!db){ lsSave(); return; }
   const col = db.collection("data/users/"+uid);
   const jobs = [col.doc("p_"+p.id).delete(), col.doc("i_"+p.id).delete()];
-  for(let i=0;i<Math.max(p.parts.length, chCount(p));i++) jobs.push(col.doc(`c_${p.id}_${i}`).delete());
+  for(let i=0;i<Math.max(p.parts.length, chCount(p));i++){ jobs.push(col.doc(`c_${p.id}_${i}`).delete()); if(p.import) jobs.push(col.doc(`s_${p.id}_${i}`).delete()); }
   try{ await Promise.all(jobs); }catch{}
 }
 function fromMeta(m){
-  return { id:m.id, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, hasImg:!!m.hasImg, coverImg:null,
+  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, hasImg:!!m.hasImg, coverImg:null,
     parts:(m.parts||[]).map(x=>x?({...x, text:undefined}):null), created:m.created||0, updated:m.updated||0, loaded:false };
 }
 function readLocal(){
@@ -888,7 +961,7 @@ function render(p){
       return `<li class="${part?.text?"":"pending"}"><button type="button" data-ch="${i}"><span class="cn">${i+1}</span><span class="ct">${escHtml(c.title||chapterLabel(p,i))}</span><span class="cs">${st}</span></button></li>`;
     }).join("");
   }
-  $("prose").innerHTML = p.parts.map((x,i)=> x ? `<section class="chapter" id="ch-${i}">${chapterSectionHtml(p,i,false)}</section>` : "").join("");
+  $("prose").innerHTML = p.parts.map((x,i)=> x && (x.text || !p.import) ? `<section class="chapter" id="ch-${i}">${chapterSectionHtml(p,i,false)}</section>` : "").join("");
   $("theend").hidden = !isComplete(p);
   $("theend").textContent = fr(p) ? "Fin" : "The End";
   updateTools();
@@ -946,7 +1019,7 @@ function renderHistory(){
     return `<li data-id="${escHtml(p.id)}" class="${p===current?"active":""}">
       <span class="sw" style="${sw}" aria-hidden="true">${escHtml((p.plan?.title||"?").trim().charAt(0).toUpperCase())}</span>
       <button class="open" type="button"><span class="t">${escHtml(p.plan?.title||"Untitled (planning stopped)")}</span>
-        <span class="m">${p.settings.format==="book"?"Book":"Story"} · ${escHtml(p.settings.genre)} · ${fmtN(totalWords(p))} w · ${done}/${chCount(p)} ch</span>
+        <span class="m">${p.import?"Made mine":p.settings.format==="book"?"Book":"Story"} · ${escHtml(p.settings.genre)} · ${fmtN(totalWords(p))} w · ${done}/${chCount(p)} ch</span>
         <span class="m">${escHtml(date)}</span>
         <span class="st ${complete?"done":"wip"}">${complete?"Finished":"In progress"}</span></button>
       <button class="del" type="button" aria-label="Delete from history">delete</button></li>`;
@@ -976,12 +1049,15 @@ $("hlist").addEventListener("click", async e=>{
   if(matchMedia("(max-width:900px)").matches) document.querySelector("main.page").scrollIntoView({block:"start"});
 });
 function showTab(which){
+  for(const t of ["write","import","hist"]){ $("tab-"+t).setAttribute("aria-selected", String(t===which)); $("pane-"+t).hidden = t!==which; }
+  return;
   const hist = which==="hist";
   $("tab-write").setAttribute("aria-selected", String(!hist)); $("tab-hist").setAttribute("aria-selected", String(hist));
   $("pane-write").hidden = hist; $("pane-hist").hidden = !hist;
 }
 $("tab-write").addEventListener("click", ()=>showTab("write"));
 $("tab-hist").addEventListener("click", ()=>showTab("hist"));
+$("tab-import").addEventListener("click", ()=>showTab("import"));
 
 /* ---------- status ---------- */
 function setStatus(text, kind=""){ $("status").className = "status " + kind; $("statusText").textContent = text; }
@@ -1018,7 +1094,7 @@ function readSettings(){
     words: Math.round(Number($("words").value)),
     delivery: document.querySelector('input[name="delivery"]:checked').value,
     genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
-    pov:$("pov").value || "Writer's choice", lang:$("lang").value, tier:$("tier").value
+    pov:$("pov").value.trim(), gender:$("gender").value, lang:$("lang").value, tier:$("tier").value
   };
 }
 function settingsValid(){
@@ -1092,7 +1168,7 @@ function planPrompt(s){
 
 Genre: ${s.genre}
 Twist type: ${s.twist}
-Point of view: ${s.pov}
+Narration: first person ("I"). The narrator is ${s.pov || "the main character (the writer's choice)"}${s.gender?`, ${s.gender}`:""}. Make the narrator the first entry in "characters".
 Language of every field and of the final text: ${s.lang}
 Premise from the writer: ${s.premise || "None. Invent one."}
 
@@ -1104,6 +1180,8 @@ ${NAME_RULES}
 Character dynamics: give the main characters wants that collide. For each important pair, define what pulls them together, what pushes them apart, who holds power, and how that changes over the story. At least one relationship must turn during the story.
 
 ${HOOK_RULES}
+
+${voiceRules(s)}
 
 ${TWIST_RULES}
 Before choosing the twist, think of the one most readers would guess, then pick one they won't that still fits every clue. Plant clues across the early and middle chapters.
@@ -1120,7 +1198,7 @@ Reply with only JSON in this shape:
  "logline": "one intriguing sentence for the back cover, no spoilers",
  "hook": "the exact opening moment and the question it plants in the reader's head",
  "setting": "place and time",
- "pov": "who tells it",
+ "pov": "First person: the narrator's name and who they are",
  "voice": "the narrative voice in concrete terms: rhythm, vocabulary, attitude",
  "characters": [{"name":"First Last","role":"age and job","want":"","fear":"","secret":"","speech":"how they talk"}],
  "dynamics": [{"between":"Name and Name","tension":"what pulls them together and apart, and who has the upper hand","shift":"how it changes over the story"}],
@@ -1173,36 +1251,193 @@ Keep the character dynamics from the bible alive in every scene.
 
 ${HOOK_RULES}
 
+${voiceRules(s)}
+
 ${STYLE_RULES}
 
 Output only the prose, paragraphs separated by blank lines. No chapter number or title, no headings, no markdown, no notes before or after.`;
 }
 
+/* ---------- make it mine: import and rewrite in the first person ---------- */
+const NUMWORDS = "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|dix-sept|dix-huit|dix-neuf|vingt|premier|première|1er";
+const HEAD_RE = new RegExp(`^\\s*(?:#{1,3}\\s*)?(?:chapter|chapitre|part|partie)\\s+(\\d+|[ivxlc]+|${NUMWORDS})\\b\\.?\\s*[:.\\-–—]?\\s*(.*)$`, "i");
+function splitChapters(raw){
+  const lines = raw.replace(/\r\n?/g,"\n").split("\n");
+  const chs = []; const pre = []; let cur = null;
+  for(const ln of lines){
+    const m = ln.trim().length < 120 ? ln.match(HEAD_RE) : null;
+    if(m){ cur = {title:(m[2]||"").replace(/^[#*\s]+|[#*\s]+$/g,"").trim(), lines:[]}; chs.push(cur); }
+    else (cur ? cur.lines : pre).push(ln);
+  }
+  const clean = arr => arr.join("\n").replace(/\n{3,}/g,"\n\n").trim();
+  let out = chs.map(c=>({title:c.title, text:clean(c.lines)})).filter(c=>words(c.text) > 0);
+  const preText = clean(pre);
+  if(out.length && words(preText) > 150) out.unshift({title:"Prologue", text:preText});
+  if(!out.length){
+    const total = words(preText);
+    if(total <= 6000) out = [{title:"", text:preText}];
+    else {
+      const paras = preText.split(/\n\s*\n/); const n = Math.ceil(total/3500), target = total/n;
+      out = []; let buf = [], w = 0;
+      for(const para of paras){ buf.push(para); w += words(para); if(w >= target && out.length < n-1){ out.push({title:"", text:buf.join("\n\n")}); buf = []; w = 0; } }
+      if(buf.length) out.push({title:"", text:buf.join("\n\n")});
+    }
+  }
+  return out;
+}
+function segmentsOf(src){
+  const paras = String(src).split(/\n\s*\n/).filter(x=>x.trim());
+  const total = words(src); if(total <= 2800) return [paras.join("\n\n")];
+  const n = Math.ceil(total/2500), target = total/n, out = []; let buf = [], w = 0;
+  for(const para of paras){ buf.push(para); w += words(para); if(w >= target && out.length < n-1){ out.push(buf.join("\n\n")); buf = []; w = 0; } }
+  if(buf.length) out.push(buf.join("\n\n"));
+  return out;
+}
+async function docxText(file){
+  const buf = new Uint8Array(await file.arrayBuffer()), dv = new DataView(buf.buffer);
+  let eocd = -1;
+  for(let i = buf.length-22; i >= Math.max(0, buf.length-65558); i--){ if(dv.getUint32(i,true)===0x06054b50){ eocd = i; break; } }
+  if(eocd < 0) throw new Error("not a docx");
+  const n = dv.getUint16(eocd+10,true); let off = dv.getUint32(eocd+16,true);
+  for(let j=0;j<n;j++){
+    const method = dv.getUint16(off+10,true), csize = dv.getUint32(off+20,true), nlen = dv.getUint16(off+28,true), elen = dv.getUint16(off+30,true), clen = dv.getUint16(off+32,true), loff = dv.getUint32(off+42,true);
+    const name = new TextDecoder().decode(buf.subarray(off+46, off+46+nlen));
+    if(name === "word/document.xml"){
+      const start = loff + 30 + dv.getUint16(loff+26,true) + dv.getUint16(loff+28,true);
+      const data = buf.subarray(start, start+csize);
+      const xml = method === 0 ? new TextDecoder().decode(data) : await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
+      const doc = new DOMParser().parseFromString(xml, "application/xml"), W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+      return [...doc.getElementsByTagNameNS(W,"p")].map(p=>{ let t = ""; for(const el of p.getElementsByTagNameNS(W,"*")){ if(el.localName==="t") t += el.textContent; else if(el.localName==="tab") t += "\t"; else if(el.localName==="br") t += "\n"; } return t; }).join("\n\n");
+    }
+    off += 46 + nlen + elen + clen;
+  }
+  throw new Error("no document.xml");
+}
+function updateSrcCount(){
+  const raw = $("srcText").value, w = words(raw);
+  if(!w){ $("srcCount").textContent = "Text (.txt), Markdown (.md) and Word (.docx) files work."; $("srcCount").className="calc"; return; }
+  const chs = splitChapters(raw);
+  $("srcCount").textContent = w > MAX_WORDS ? `${fmtN(w)} words: that's over the ${fmtN(MAX_WORDS)}-word limit.` : `${fmtN(w)} words · ${chs.length} ${chs.length>1?"chapters":"chapter"} found`;
+  $("srcCount").className = w > MAX_WORDS ? "calc warn" : "calc";
+}
+$("srcText").addEventListener("input", updateSrcCount);
+$("srcFile").addEventListener("change", async e=>{
+  const file = e.target.files?.[0]; e.target.value = ""; if(!file) return;
+  try{
+    const text = /\.docx$/i.test(file.name) ? await docxText(file) : await file.text();
+    if(!text.trim()) throw new Error("empty");
+    $("srcText").value = text; updateSrcCount();
+    if(!$("impTitle").value) $("impTitle").placeholder = file.name.replace(/\.[^.]+$/,"").replace(/[-_]+/g," ");
+  } catch { $("srcCount").textContent = "That file couldn't be read. Use a .txt, .md or .docx file, or paste the text."; $("srcCount").className = "calc warn"; }
+});
+function importMetaPrompt(raw, chs, o){
+  const openings = chs.map((c,i)=>`${i+1}. ${c.title?`[heading: ${c.title}] `:""}"${c.text.slice(0,300).replace(/\s+/g," ")}"`).join("\n");
+  return `Read the start of this story and reply with only JSON:
+{"language":"English or Français: the language the story is written in",
+ "title":"${o.title ? `exactly: ${o.title.replace(/"/g,"'")}` : "the story's title if it states one, otherwise a short intriguing title (1 to 5 words, concrete, taken from something in the story, no colon)"}",
+ "logline":"one intriguing sentence for the back cover, no spoilers",
+ "genre":"one or two words",
+ "setting":"place and time",
+ "narrator":{"name":"${o.narrator ? `the character who matches: ${o.narrator.replace(/"/g,"'")}` : "the main character, whose story this is"}","role":"age and job if known","gender":"man, woman or unknown"},
+ "current_pov":"first, second or third person",
+ "voice":"how this narrator should sound telling it in the first person: rhythm, vocabulary, attitude",
+ "characters":[{"name":"","role":""}],
+ "chapter_titles":["exactly ${chs.length} short, concrete chapter titles in the story's language, one per chapter listed below; keep a heading's title when it has one"]}
+
+Chapters (opening lines):
+${openings}
+
+STORY START:
+"""${raw.slice(0,9000)}"""`;
+}
+function importPrompt(p, i, k, K, seg){
+  const s = p.settings, plan = p.plan, nar = plan.narrator || {}, N = chCount(p);
+  const fr = s.lang === "Français";
+  const g = s.gender==="a woman" ? (fr ? " She is a woman: in French, every past participle and adjective about me agrees in the feminine (je suis allée, je me suis sentie seule)." : " The narrator is a woman.")
+          : s.gender==="a man" ? (fr ? " He is a man: masculine agreement in French (je suis allé, je me suis senti seul)." : " The narrator is a man.") : "";
+  const before = (p.parts[i]?.text || (i>0 ? p.parts[i-1]?.text : "") || "");
+  const tail = before ? cleanModelText(before).slice(-3000) : "";
+  const others = (plan.characters||[]).filter(c=>c.name && c.name!==nar.name).map(c=>`${c.name}${c.role?` (${c.role})`:""}`).join("; ");
+  return `Rewrite this passage so it becomes the narrator's own story, told in the first person by someone who lived it.
+Language of your output: ${s.sameLang ? "the same language as the passage" : s.lang}${!s.sameLang ? " (translate if the passage is in another language)" : ""}.
+The narrator, "I", is ${nar.name || "the main character"}${nar.role?`, ${nar.role}`:""}.${g}
+Other people: ${others || "as in the text"}.
+Narrative voice: ${plan.voice || "natural, honest, specific"}.
+
+How to rewrite:
+- Every reference to the narrator in the third person (he, she, his, her, their name) or in the second person ("you" meaning the main character) becomes I, me, my, mine, myself${fr?" (je, me, moi, mon, ma, mes, le mien, moi-même)":""}. Fix every verb form, possessive, reflexive and agreement that changes as a result, so the text reads as if it was always written this way.
+- Other people stay in the third person. In dialogue, people still speak to me as "you"${fr?' ("tu" or "vous", as in the original)':""}; keep that.
+- I only know what I saw, heard, was told or can guess. Passages that enter other people's heads become what I notice or suspect.
+- Keep every event, fact, name, place and line of dialogue, in the same order. Do not add new events or characters, and do not summarise or cut anything.
+${s.deep ? "- Deepen my inner voice so it feels like it comes from deep inside me: where it fits naturally, add short honest thoughts, physical sensations and brief memories. Keep them restrained and specific. The result can be up to about 20% longer than the original." : "- Keep the length close to the original (within about 10%)."}
+- Write natural, human prose. Never use these words or phrases: ${BANNED_WORDS.join(", ")}. Use em dashes rarely.
+${tail ? `\nMY REWRITTEN TEXT JUST BEFORE THIS PASSAGE (continue in the same voice, don't repeat it):\n"""${tail}"""\n` : ""}
+PASSAGE TO REWRITE${N>1||K>1 ? ` (chapter ${i+1} of ${N}${K>1?`, part ${k} of ${K}`:""})` : ""}:
+"""${seg}"""
+
+Output only the rewritten passage, paragraphs separated by blank lines. No title, no headings, no notes.`;
+}
+$("fi").addEventListener("submit", async ev=>{
+  ev.preventDefault(); if(busy || !sample) return;
+  const raw = $("srcText").value.trim(), total = words(raw);
+  if(total < 40){ setStatus("Paste or import a story of at least a few paragraphs first.","err"); return; }
+  if(total > MAX_WORDS){ setStatus(`That text is over the ${fmtN(MAX_WORDS)}-word limit. Import it in parts.`,"err"); return; }
+  const o = { narrator:$("impNarrator").value.trim(), gender:$("impGender").value, title:$("impTitle").value.trim(), lang:$("impLang").value, deep:$("impDeep").checked, tier:$("impTier").value };
+  const chs = splitChapters(raw);
+  const p = { id:"p"+Date.now().toString(36), import:true,
+    settings:{ format: chs.length>1?"book":"story", chapters:chs.length, words:total, delivery:"all", genre:"", twist:"", premise:"", pov:o.narrator, gender:o.gender, lang:o.lang||"English", sameLang:!o.lang, deep:o.deep, tier:o.tier },
+    plan:null, cover:null, coverImg:null, imgPrompt:null, parts: chs.map(c=>({src:c.text, text:"", segDone:0, done:false, recap:""})),
+    created:Date.now(), updated:Date.now(), loaded:true };
+  setBusy(true); render(p); setProgress(0);
+  setStatus("Reading your story: who it's about, its chapters and its voice","busy");
+  ctl = new AbortController();
+  try{
+    const m = await sample.json(importMetaPrompt(raw, chs, o), { modelTier:"default", cache:false, signal:ctl.signal });
+    if(!m || typeof m !== "object") throw {code:"invalid_json"};
+    const str = v => v==null ? "" : String(v);
+    if(!o.lang) p.settings.lang = /fran/i.test(str(m.language)) ? "Français" : "English";
+    p.settings.genre = str(m.genre) || "Literary";
+    if(!o.gender){ const gg = str(m.narrator?.gender).toLowerCase(); p.settings.gender = gg.startsWith("w")||gg.startsWith("f") ? "a woman" : gg.startsWith("m")||gg.startsWith("h") ? "a man" : ""; }
+    const titles = Array.isArray(m.chapter_titles) ? m.chapter_titles.map(str) : [];
+    const narrator = { name:str(m.narrator?.name) || o.narrator || "", role:str(m.narrator?.role) };
+    p.settings.pov = narrator.name;
+    p.plan = { title: o.title || str(m.title) || "Untitled", title_options: [o.title || str(m.title)].filter(Boolean), logline:str(m.logline), premise:"", hook:"",
+      setting:str(m.setting), pov:`First person: ${narrator.name}`, voice:str(m.voice), narrator,
+      characters:[{name:narrator.name, role:narrator.role, want:"", fear:"", secret:"", speech:""}, ...(Array.isArray(m.characters)?m.characters:[]).filter(c=>c && c.name && c.name!==narrator.name).map(c=>({name:str(c.name), role:str(c.role)}))],
+      chapters: chs.map((c,i)=>({ title: c.title || titles[i] || chapterLabel(p,i), summary:"", goal:"", obstacle:"", turn:"", cliffhanger:"", beats:[] })) };
+    await storeSave(p, {src:true});
+  } catch(e){ setBusy(false); failed(e); render(EXAMPLE); return; }
+  setBusy(false);
+  makeCover(p);
+  await run(p, true);
+});
+
 /* ---------- writing ---------- */
 async function writeChapter(p, i){
-  const K = segsFor(p), N = chCount(p);
   p.parts[i] = p.parts[i] || {text:"", segDone:0, done:false, recap:""};
   const part = p.parts[i];
+  const srcSegs = p.import ? segmentsOf(part.src||"") : null;
+  const K = p.import ? srcSegs.length : segsFor(p), N = chCount(p);
   if(current===p && !document.getElementById("ch-"+i)) render(p);
   for(let k = part.segDone + 1; k <= K; k++){
     const base = part.text, sep = base ? "\n\n" : "";
-    setStatus(`Writing chapter ${i+1} of ${N}${K>1?` · part ${k} of ${K}`:""}`,"busy");
+    setStatus(`${p.import?"Rewriting":"Writing"} chapter ${i+1} of ${N}${K>1?` · part ${k} of ${K}`:""}`,"busy");
     setProgress((i + (k-1)/K) / N);
     ctl = new AbortController();
     try{
-      const r = await sample(segPrompt(p,i,k,K), { modelTier:p.settings.tier, cache:false, signal:ctl.signal,
+      const r = await sample(p.import ? importPrompt(p,i,k,K,srcSegs[k-1]) : segPrompt(p,i,k,K), { modelTier:p.settings.tier, cache:false, signal:ctl.signal,
         onText:({text})=>{ part.text = base + sep + text; renderStreamingChapter(p,i); } });
       part.text = base + sep + r.text;
       part.segDone = k; storeSave(p,{chapters:[i]});
     } catch(e){
       if(e?.text){ part.text = base + sep + e.text; part.segDone = k; } else { part.text = base; }
-      if(!part.text){ p.parts[i] = undefined; while(p.parts.length && !p.parts[p.parts.length-1]) p.parts.pop(); }  // nothing written: don't leave a stuck "Writing…" chapter
+      if(!part.text && !p.import){ p.parts[i] = undefined; while(p.parts.length && !p.parts[p.parts.length-1]) p.parts.pop(); }  // nothing written: don't leave a stuck "Writing…" chapter
       storeSave(p,{chapters:p.parts[i]?[i]:[]}); if(current===p) render(p); throw e;
     }
   }
   part.done = true; storeSave(p,{chapters:[i]}); if(current===p) render(p);
   setProgress((i+1)/N);
-  if(N > 1 && i < N-1){
+  if(N > 1 && i < N-1 && !p.import){
     setStatus(`Noting what happened in chapter ${i+1}`,"busy");
     ctl = new AbortController();
     try{
@@ -1315,7 +1550,7 @@ $("again").addEventListener("click", ()=>{
   const p = current; if(busy || !sample || !p.plan) return;
   let i = -1; p.parts.forEach((x,j)=>{ if(x?.text) i = j; });
   if(i<0) return;
-  p.parts[i] = {text:"", segDone:0, done:false, recap:""};
+  p.parts[i] = {src:p.parts[i]?.src, text:"", segDone:0, done:false, recap:""};
   p.parts.length = i+1;
   render(p); run(p, false);
 });
