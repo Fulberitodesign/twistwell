@@ -184,6 +184,14 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
 .prose mark{background:var(--flag);color:var(--flag-ink);border-radius:2px;padding:0 1px}
 .prose .caret{display:inline-block;width:.5em;height:1em;background:var(--brass);vertical-align:-.12em;margin-left:2px}
 .prose .waiting{font-family:var(--prose);font-style:italic;color:var(--muted);text-align:center;text-indent:0}
+.pubgrid{display:flex;flex-direction:column;gap:12px}
+.pubrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding-bottom:12px;border-bottom:1px dotted var(--line)}
+.pubrow:last-child{border-bottom:0}
+.pubrow .label{grid-column:1/-1}
+.pubrow .val{font-size:15px;min-width:0;overflow-wrap:anywhere}
+.pubrow .val .tag{display:inline-block;margin:0 6px 6px 0;padding:3px 9px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:13px}
+.pubrow .val.desc{font-family:var(--prose);font-size:15.5px;line-height:1.6;white-space:pre-line}
+.pubhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
 .theend{text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin:56px 0 8px}
 </style>
 
@@ -408,6 +416,14 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
       <nav class="contents" id="contents" hidden><h3 id="contentsLabel">Contents</h3><ol id="toc"></ol></nav>
       <article class="prose" id="prose"></article>
       <p class="theend" id="theend" hidden>The End</p>
+      <details class="panel" id="pub" open hidden>
+        <summary>Publishing details (NovelSnack form)</summary>
+        <div class="panel-body">
+          <div class="pubhead"><p class="note">Every field matches this story. Copy them one by one into the publishing form; for drop-down lists, pick the closest option.</p>
+            <button type="button" class="btn small" id="pubGen">Generate</button></div>
+          <div class="pubgrid" id="pubGrid"></div>
+        </div>
+      </details>
     </div>
   </main>
 </div>
@@ -807,7 +823,7 @@ let db = null, uid = null;
 let history = [];   // project objects; chapter text may be unloaded (loaded:false)
 const writeChains = new Map();
 function queued(path, fn){ const prev = writeChains.get(path) || Promise.resolve(); const next = prev.catch(()=>{}).then(fn); writeChains.set(path, next); return next; }
-const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, hasImg:!!p.coverImg,
+const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, publish:p.publish||null, hasImg:!!p.coverImg,
   parts:p.parts.map(x=>x?({done:!!x.done,segDone:x.segDone||0,recap:x.recap||"",words:partWords(x)}):null), created:p.created, updated:p.updated });
 function lsSave(){
   try{
@@ -862,7 +878,7 @@ async function storeDelete(p){
   try{ await Promise.all(jobs); }catch{}
 }
 function fromMeta(m){
-  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, hasImg:!!m.hasImg, coverImg:null,
+  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, publish:m.publish||null, hasImg:!!m.hasImg, coverImg:null,
     parts:(m.parts||[]).map(x=>x?({...x, text:undefined}):null), created:m.created||0, updated:m.updated||0, loaded:false };
 }
 function readLocal(){
@@ -990,6 +1006,7 @@ function render(p){
   $("prose").innerHTML = p.parts.map((x,i)=> x && (x.text || !p.import) ? `<section class="chapter" id="ch-${i}">${chapterSectionHtml(p,i,false)}</section>` : "").join("");
   $("theend").hidden = !isComplete(p);
   $("theend").textContent = fr(p) ? "Fin" : "The End";
+  renderPublish(p);
   updateTools();
   renderHistory();
 }
@@ -1284,6 +1301,82 @@ ${STYLE_RULES}
 Output only the prose, paragraphs separated by blank lines. No chapter number or title, no headings, no markdown, no notes before or after.`;
 }
 
+/* ---------- publishing details (NovelSnack form) ---------- */
+const PUB_FIELDS = [
+  ["title","Title"], ["channel","Channel"], ["genre","Genre"], ["world","World setting (1–2)"], ["tone","Tone (1–3)"],
+  ["relationship","Relationship (1)"], ["plot","Plot tags (0–4)"], ["protagonist","Protagonist tags, ML/FL (0–4)"], ["description","Description"]
+];
+const pubText = v => Array.isArray(v) ? v.join(", ") : String(v ?? "");
+function renderPublish(p){
+  const show = !!p.plan && !p.example && (isComplete(p) || !!p.publish);
+  $("pub").hidden = !show;
+  if(!show) return;
+  const working = coverBusy.has("pub:"+p.id);
+  $("pubGen").textContent = working ? "Writing…" : p.publish ? "Regenerate" : "Generate";
+  $("pubGen").disabled = working || !sample;
+  const d = p.publish;
+  if(!d){ $("pubGrid").innerHTML = `<p class="note">${working ? "Writing the publishing details…" : "Press Generate to fill in the publishing details for this story."}</p>`; return; }
+  $("pubGrid").innerHTML = PUB_FIELDS.map(([k,label])=>{
+    const v = d[k]; if(v==null || (Array.isArray(v) && !v.length) || v==="") return "";
+    const html = Array.isArray(v) ? v.map(t=>`<span class="tag">${escHtml(t)}</span>`).join("") : escHtml(v);
+    return `<div class="pubrow"><span class="label">${escHtml(label)}${k==="description"?` · ${words(v)} words`:""}</span><div class="val${k==="description"?" desc":""}">${html}</div><button type="button" class="link" data-pub="${k}">Copy</button></div>`;
+  }).join("");
+}
+$("pubGrid").addEventListener("click", async e=>{
+  const b = e.target.closest("button[data-pub]"); if(!b || !current.publish) return;
+  const text = pubText(current.publish[b.dataset.pub]);
+  try{ await navigator.clipboard.writeText(text); b.textContent = "Copied"; }
+  catch{ const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = "Selected, press copy"; }
+  setTimeout(()=>b.textContent = "Copy", 1600);
+});
+function publishPrompt(p){
+  const plan = p.plan || {}, s = p.settings;
+  const recaps = p.parts.map((x,i)=> x?.recap ? `Ch ${i+1}: ${x.recap}` : "").filter(Boolean).join("\n");
+  const outline = (plan.chapters||[]).map((c,i)=>`${i+1}. ${c.title}${c.summary?`: ${c.summary}`:""}`).join("\n");
+  const opening = cleanModelText(p.parts[0]?.text || "").slice(0, 2500);
+  return `You prepare the publishing form for a web-novel platform (NovelSnack, similar to Webnovel, GoodNovel and Dreame) for this ${s.format==="book"?"novel":"story"}.
+
+Title: ${plan.title}
+Genre chosen by the writer: ${s.genre}
+Logline: ${plan.logline||""}
+Setting: ${plan.setting||""}
+Narrator: ${plan.pov||""}
+Characters: ${(plan.characters||[]).map(c=>`${c.name} (${c.role}${c.secret?`; hides: ${c.secret}`:""})`).join(" | ")}
+Twist (never reveal it): ${plan.twist?.reveal||"not stated"}
+Outline:
+${outline}
+${recaps ? `What happens:\n${recaps}\n` : ""}
+Opening of the text:
+"""${opening}"""
+
+Fill every field so it matches this story exactly, using the short labels such platforms use in their drop-down lists and tag pickers:
+- channel: "Women's Fiction" or "Men's Fiction", from the lead and the readership.
+- genre: one genre label, for example Romance, Billionaire Romance, Werewolf, Mafia, Fantasy, Urban, Mystery/Thriller, Teenfiction/Young Adult, Horror, Sci-fi, LGBTQ+.
+- world: 1 or 2 world-setting tags, for example Modern, Urban, Small Town, Another World, Future, Ancient, Campus, Supernatural.
+- tone: 1 to 3 tone tags, for example Sweet, Heartwarming, Humorous, Bittersweet, Angst, Suspense, Dark, Tragedy, Steamy, Weird, Trauma, Healing.
+- relationship: exactly one, for example Romance, Second Chance, Forbidden Love, Family Emotions, Friendship, Love-Hate.
+- plot: up to 4 plot tags, for example Contract Marriage, Fake Relationship, Secret Baby, Second Chance, Enemies to Lovers, Forbidden Love, Love-Triangle, Revenge, Betrayal, Hidden Identity, Arranged Marriage, Home drama, Crush, Regret, Slow Burn.
+- protagonist: up to 4 tags describing the male lead (ML) and female lead (FL), for example Billionaire, CEO, Alpha, Stepbrother, Mafia Boss, Single Mother, Independent, Kickass Heroine, Hidden Identity, Sensual, Cold, Badboy.
+- description: 150 to 250 words (never more than 300), written in the same language as the story, told by the narrator in the first person ("I"). It must make people need to read the whole book: open with a concrete, startling first line, set up who I am and what I want in a few plain sentences, raise the stakes and the central question, give one or two specific moments that make the reader feel something, then end on a sharp unanswered question or a cliffhanger line. Short paragraphs separated by blank lines. Natural, human wording: no clichés, no "little did I know", no hashtags, no emojis, no spoilers of the twist or the ending.
+
+Reply with only JSON:
+{"title":"${(plan.title||"").replace(/"/g,"'")}","channel":"","genre":"","world":[""],"tone":[""],"relationship":"","plot":[""],"protagonist":[""],"description":""}`;
+}
+async function makePublish(p){
+  if(!sample || !p.plan || coverBusy.has("pub:"+p.id)) return;
+  coverBusy.add("pub:"+p.id); if(current===p) renderPublish(p);
+  try{
+    const r = await sample.json(publishPrompt(p), { modelTier: p.settings.tier || "default", cache:false });
+    if(!r || typeof r !== "object" || !r.description) throw {code:"invalid_json"};
+    const arr = (v,n) => (Array.isArray(v) ? v : String(v||"").split(/,\s*/)).map(x=>String(x).trim()).filter(Boolean).slice(0,n);
+    p.publish = { title: String(r.title || p.plan.title), channel: String(r.channel||""), genre: String(r.genre||""), world: arr(r.world,2), tone: arr(r.tone,3),
+      relationship: String(Array.isArray(r.relationship) ? r.relationship[0] : r.relationship || ""), plot: arr(r.plot,4), protagonist: arr(r.protagonist,4), description: String(r.description).trim() };
+    storeSave(p);
+  } catch(e){ if(current===p && !busy) setStatus(e?.code==="invalid_json" ? "The publishing details came back garbled. Press Generate again." : errCopy(e),"err"); if(isFatal(e)) sample = null; }
+  finally { coverBusy.delete("pub:"+p.id); if(current===p) renderPublish(p); }
+}
+$("pubGen").addEventListener("click", ()=>{ if(current.plan && !current.example) makePublish(current); });
+
 /* ---------- make it mine: import and rewrite in the first person ---------- */
 const NUMWORDS = "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|dix-sept|dix-huit|dix-neuf|vingt|premier|première|1er";
 const HEAD_RE = new RegExp(`^\\s*(?:#{1,3}\\s*)?(?:chapter|chapitre|part|partie)\\s+(\\d+|[ivxlc]+|${NUMWORDS})\\b\\.?\\s*[:.\\-–—]?\\s*(.*)$`, "i");
@@ -1485,6 +1578,7 @@ async function run(p, all){
       if(!all) break;
     }
     setProgress(isComplete(p) ? 1 : (p.parts.filter(x=>x?.done).length / chCount(p)));
+    if(isComplete(p) && !p.publish) makePublish(p);
     setStatus(isComplete(p) ? `Finished · ${fmtN(totalWords(p))} words · saved to History` : `Chapter ${nextIndex(p)} done. Press "Write chapter ${nextIndex(p)+1}" when you're ready.`);
   } catch(e){ failed(e); }
   finally { setBusy(false); if(current===p) render(p); }
@@ -1794,7 +1888,7 @@ storeInit();
 (async ()=>{
   try { sample = await window.claude?.use?.("sample"); } catch { sample = null; }
   if(!sample) $("avail").textContent = "The writing service didn't load. Check your connection and reload the page.";
-  updateTools(); renderCover(current);
+  updateTools(); renderCover(current); renderPublish(current);
 })();
 })();
 </script>
