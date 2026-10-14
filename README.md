@@ -4,10 +4,19 @@ Twistwell writes stories and novels built around a strong hook, clear character 
 
 ## How it works
 
-- It's a static site: everything is in `public/` (`index.html` is the app, `shim.js` connects it to the writing service).
-- Writing runs through [Puter.js](https://docs.puter.com). Each visitor signs in to their own Puter account and their use goes on that account. The site needs no API key and costs its owner nothing.
+- `public/` holds the website: `index.html` is the app and `shim.js` connects it to the server.
+- `netlify/edge-functions/write.js` sends writing requests to the Anthropic API and streams the text back. The API key stays on Netlify and never reaches the browser.
 - History is saved in each visitor's own browser.
 
-## Deploy
+## Settings (Netlify → Site configuration → Environment variables)
 
-On Netlify, import this repository. There is no build command; the publish folder is `public` (already set in `netlify.toml`).
+| Variable | Required | What it does |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | yes | Your key from console.anthropic.com |
+| `ACCESS_CODE` | no | If set, visitors must enter this code before writing |
+| `RATE_LIMIT_PER_HOUR` | no | Requests allowed per visitor per hour (default 120) |
+| `MODEL_QUICK`, `MODEL_DEFAULT`, `MODEL_COMPLEX` | no | Override the Claude models used |
+
+After you change a variable, redeploy (Deploys → Trigger deploy) so the change takes effect.
+
+**Set a monthly spending limit** in the Anthropic console (Settings → Limits). That is the real protection against unexpected costs on a public site.

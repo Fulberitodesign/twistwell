@@ -1,10 +1,8 @@
-// Twistwell standalone runtime: gives the app the same `claude.use()` interface it has inside Claude.
-// Writing runs through Puter.js (https://docs.puter.com): each visitor signs in to their own Puter account
-// and their use is billed to that account, so the site owner needs no API key and pays nothing.
+// Twistwell standalone runtime: gives the app the same `claude.use()` interface it has inside Claude,
+// backed by the site's own /api/write endpoint and normal browser downloads.
 (() => {
-  const MODELS = { quick: "claude-sonnet-5", default: "claude-sonnet-5", complex: "claude-opus-5-5" };
-  const FALLBACK_MODEL = "claude-sonnet-5";
-  const JSON_RULE = "Reply with only one valid JSON value. No prose before or after it, no Markdown code fences.";
+  const CODE_KEY = "twistwell.accessCode";
+  const getCode = () => { try { return localStorage.getItem(CODE_KEY) || ""; } catch { return ""; } };
 
   function parseJsonLoose(text) {
     const t = String(text || "").trim();
@@ -16,67 +14,65 @@
     throw { code: "invalid_json", message: "No JSON in reply", text: t };
   }
 
-  function classify(err) {
-    let raw = "";
-    try { raw = typeof err === "string" ? err : JSON.stringify(err); } catch {}
-    const m = [err?.message, err?.error?.message, err?.error?.code, err?.code, typeof err?.error === "string" ? err.error : "", raw].filter(Boolean).join(" ");
-    if (/insufficient|funds|funding|balance|credit|quota|limit reached|usage limit|payment|upgrade/i.test(m)) return { code: "no_credit", message: m };
-    if (/rate|too many|overloaded|busy/i.test(m)) return { code: "rate_limited", message: m };
-    if (/sign ?in|auth|login|unauthori[sz]ed|401/i.test(m)) return { code: "not_signed_in", message: m };
-    if (/too long|too large|context|token/i.test(m)) return { code: "prompt_too_large", message: m };
-    if (/model/i.test(m)) return { code: "bad_model", message: m };
-    return { code: "upstream_error", message: m || "Writing service error" };
-  }
-
-  // Must run before any other await so the sign-in window opens inside the click that started it.
-  async function ensureAuth() {
-    const P = window.puter;
-    if (!P?.ai?.chat) throw { code: "no_puter", message: "Puter.js didn't load" };
-    if (P.auth?.isSignedIn && !P.auth.isSignedIn()) {
-      try { await P.auth.signIn(); } catch { throw { code: "not_signed_in", message: "Sign-in was closed" }; }
-      window.dispatchEvent(new CustomEvent("twistwell:auth"));
-    }
-  }
-
-  async function run(messages, opts, model) {
-    const resp = await window.puter.ai.chat(messages, false, { model, stream: true, max_tokens: opts.modelTier === "quick" ? 4000 : 32000 });
-    let text = "";
-    if (resp && typeof resp[Symbol.asyncIterator] === "function") {
-      for await (const part of resp) {
-        if (opts.signal?.aborted) { const e = { code: "cancelled", message: "Cancelled" }; if (text) e.text = text; throw e; }
-        if (part?.type === "error") { const e = classify(part); if (text) e.text = text; throw e; }
-        const t = (part?.type === undefined || part?.type === "text") ? part?.text : "";
-        if (t) {
-          text += t;
-          if (opts.onText && text.trim()) { try { opts.onText({ text, delta: t }); } catch (e) { console.error(e); } }
-        }
-      }
-    } else {
-      // non-streamed reply (older Puter builds)
-      const c = resp?.message?.content;
-      text = typeof c === "string" ? c : Array.isArray(c) ? c.map((b) => b?.text || "").join("") : String(resp ?? "");
-      if (opts.onText && text.trim()) opts.onText({ text, delta: text });
-    }
-    return text;
-  }
-
   async function call(input, opts = {}, json = false) {
     if (opts.signal?.aborted) throw { code: "cancelled", message: "Cancelled" };
-    await ensureAuth();
-    let messages = typeof input === "string" ? [{ role: "user", content: input }] : input.map((m) => ({ role: m.role, content: m.content }));
-    if (json) messages = [{ role: "system", content: JSON_RULE }, ...messages];
-    const model = MODELS[opts.modelTier] || MODELS.default;
-    let text;
+    const messages = typeof input === "string" ? [{ role: "user", content: input }] : input;
+    let res;
     try {
-      text = await run(messages, opts, model);
+      res = await fetch("/api/write", {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-access-code": getCode() },
+        body: JSON.stringify({ messages, tier: opts.modelTier || "default", json }),
+        signal: opts.signal,
+      });
     } catch (e) {
-      const err = e?.code ? e : classify(e);
-      if (err.code === "bad_model" && !err.text && model !== FALLBACK_MODEL) text = await run(messages, opts, FALLBACK_MODEL).catch((e2) => { throw e2?.code ? e2 : classify(e2); });
-      else { if (err.code === "bad_model") err.code = "upstream_error"; throw err; }
+      throw { code: e?.name === "AbortError" ? "cancelled" : "upstream_error", message: String(e?.message || e) };
     }
+    if (!res.ok) {
+      let info = {};
+      try { info = await res.json(); } catch {}
+      const map = { rate_limited: "rate_limited", prompt_too_large: "prompt_too_large", access_code: "access_code", no_key: "no_key", no_credit: "no_credit", invalid_request: "invalid_request" };
+      const err = { code: map[info.code] || "upstream_error", message: info.message || "HTTP " + res.status };
+      if (err.code === "access_code") window.dispatchEvent(new CustomEvent("twistwell:access"));
+      throw err;
+    }
+
+    const reader = res.body.getReader(), dec = new TextDecoder();
+    let buf = "", text = "", truncated = false, streamErr = null;
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        let idx;
+        while ((idx = buf.indexOf("\n\n")) >= 0) {
+          const block = buf.slice(0, idx); buf = buf.slice(idx + 2);
+          const dataLine = block.split("\n").filter((l) => l.startsWith("data:")).map((l) => l.slice(5).trim()).join("");
+          if (!dataLine) continue;
+          let ev; try { ev = JSON.parse(dataLine); } catch { continue; }
+          if (ev.type === "content_block_delta" && ev.delta?.type === "text_delta" && ev.delta.text) {
+            text += ev.delta.text;
+            if (opts.onText && text.trim()) { try { opts.onText({ text, delta: ev.delta.text }); } catch (e) { console.error(e); } }
+          } else if (ev.type === "message_delta" && ev.delta?.stop_reason === "max_tokens") {
+            truncated = true;
+          } else if (ev.type === "error") {
+            const t = ev.error?.type;
+            streamErr = { code: t === "overloaded_error" || t === "rate_limit_error" ? "rate_limited" : "upstream_error", message: ev.error?.message || "Stream error" };
+          }
+        }
+      }
+    } catch (e) {
+      const err = { code: e?.name === "AbortError" || opts.signal?.aborted ? "cancelled" : "upstream_error", message: String(e?.message || e) };
+      if (text) err.text = text;
+      throw err;
+    }
+    if (streamErr) { if (text) streamErr.text = text; throw streamErr; }
     if (!text.trim()) throw { code: "empty_completion", message: "Empty reply" };
-    if (json) return parseJsonLoose(text);
-    return { text, truncated: false, modelTierApplied: opts.modelTier || "default" };
+    if (json) {
+      if (truncated) throw { code: "invalid_json", message: "Reply was cut short", text };
+      return parseJsonLoose(text);
+    }
+    return { text, truncated, modelTierApplied: opts.modelTier || "default" };
   }
 
   const sample = (input, opts) => call(input, opts, false);
@@ -95,4 +91,18 @@
   };
 
   window.claude = { use: async (name) => ({ sample, downloads }[name] ?? null) };
+
+  // Access code bar, shown only when the site owner has set ACCESS_CODE on Netlify.
+  window.addEventListener("twistwell:access", () => {
+    if (document.getElementById("accessBar")) return;
+    const bar = document.createElement("form");
+    bar.id = "accessBar";
+    bar.innerHTML = '<label for="accessInput">This site needs an access code</label><input id="accessInput" type="password" autocomplete="off"><button type="submit">Save</button>';
+    bar.addEventListener("submit", (e) => {
+      e.preventDefault();
+      try { localStorage.setItem(CODE_KEY, document.getElementById("accessInput").value.trim()); } catch {}
+      bar.remove();
+    });
+    document.body.prepend(bar);
+  });
 })();
