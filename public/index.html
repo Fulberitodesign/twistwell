@@ -191,6 +191,10 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
 .pubrow .val{font-size:15px;min-width:0;overflow-wrap:anywhere}
 .pubrow .val .tag{display:inline-block;margin:0 6px 6px 0;padding:3px 9px;border-radius:999px;background:var(--panel);border:1px solid var(--line);font-size:13px}
 .pubrow .val.desc{font-family:var(--prose);font-size:15.5px;line-height:1.6;white-space:pre-line}
+.pubstep{margin:10px 0 0;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brass);border-top:1px solid var(--line);padding-top:14px}
+.pubrow .label .wc{color:var(--muted)}
+.pubrow .label .wc.bad{color:var(--flag-ink)}
+.pubrow .hint{grid-column:1/-1;font-size:12.5px;color:var(--muted);margin:-2px 0 2px}
 .pubhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
 .theend{text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin:56px 0 8px}
 </style>
@@ -417,9 +421,9 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
       <article class="prose" id="prose"></article>
       <p class="theend" id="theend" hidden>The End</p>
       <details class="panel" id="pub" open hidden>
-        <summary>Publishing details (NovelSnack form)</summary>
+        <summary>Publishing details: the full NovelSnack form</summary>
         <div class="panel-body">
-          <div class="pubhead"><p class="note">Every field matches this story. Copy them one by one into the publishing form. Every tag is taken from the form's own lists.</p>
+          <div class="pubhead"><p class="note">Every field matches this story. All three steps of the NovelSnack form, in order. Every option comes from the form's own lists, and every text respects its word limits. Copy them one by one.</p>
             <button type="button" class="btn small" id="pubGen">Generate</button></div>
           <div class="pubgrid" id="pubGrid"></div>
         </div>
@@ -1308,6 +1312,9 @@ const PUB_FIELDS = [
 ];
 // Exact options of the NovelSnack form (taken from screenshots of its pickers)
 const NS_LISTS = {"channel": ["Women's Fiction"], "genre": ["Romance", "Contemporary Romance", "Billionaire", "Werewolf", "Mafia", "Dark Romance", "Paranormal", "Fantasy", "Eastern Fantasy", "Family Drama", "Sci-Fi Romance", "Short Stories", "Urban", "Urban/Realistic", "Modern", "Chicklit", "LGBTQ+", "Sports Romance", "Sweet", "Tortured", "Teenfiction/Young Adult", "Newadult", "Action/Adventure", "Suspense", "Historical romance", "Mystery/Thriller"], "world": ["Cyberpunk", "Future", "Historical", "Magic", "Post-apocalypse", "Xianxia", "Another World", "Campus", "City", "Gang", "Highschool", "Medieval", "Mythology", "Office", "Pack", "Regency", "Small Town", "Victorian", "Apocalypse", "Magical world", "Multiverse", "High-Tech World", "Realistic Earth", "Supernature Earth"], "tone": ["Twisted", "Weird", "Cozy", "Spiritual", "Scary", "Hate", "Religious", "Trauma", "Work Place", "Silly", "Serious", "Uplifting", "Lighthearted", "Clean & Wholesome", "Warm", "Optimistic", "Kicking", "General Fiction", "Powerful", "Dark", "Gothic", "Hot", "Heartbreak", "Healing", "Hurt", "Pain", "Heavy", "Sweet", "Thriller", "Mysterious", "Angsty", "Humor", "Happy", "Inspiring", "Innocent", "Relaxing", "Sliceoflife", "Bittersweet", "Fantasy", "Feel-Good Story", "Horror", "Lightnovel", "Modern", "Romance", "Romantasy", "Suspense", "Tragic love", "Drama", "Comedy", "Tragedy", "Funny"], "relationship": ["Family Emotions", "Yandere", "BXG", "GXG", "BXB", "MXM", "MXB", "Bisexual", "Kinky", "BDSM", "LGBT+"], "plot": ["Entertainment Industry", "Forensic", "Ghost Stories", "Magic Realism", "Paranormal Horror", "Showbiz Romance", "Ugly Ducking", "Survival", "Chasing the Ex", "Weak to Strong/Poor to Rich", "Kickass Hero", "Gentleman", "Adopted Son-in-Law", "Mercenary", "Abuse", "Crime", "Reincarnation/Rebirth", "Accidental Pups", "Destiny", "Fated Mate", "Witchcraft", "Superpower", "War", "Military", "Interracial", "Urban", "Body Exchange", "Revenge", "Lies", "Redemption", "Game", "Regret", "Temptation", "Manipulative", "Rejected Mate", "Bully", "Bet/Trick", "Stepfamily", "Fated", "Obsession", "Kingdom", "Shifter", "Steampunk", "Transmigration", "Time Travel", "Fairy Tale", "Legend", "Adventure", "Twins", "Multiple birth", "Rogue", "Kidnap", "Forbidden", "Best Friend's Brother", "Brother's Best Friend", "Sister/Friend's Boyfriend", "Father's Friend", "Professor/Student", "Jealousy", "Curse", "Divorce", "Contract Marriage/Arranged marriage", "Turn into Beauty", "Academy", "Friends With Benefits", "Infidelity", "Affair", "Wedding", "Celebrity", "Truelove", "Rages to Riches", "Weak to Strong", "Fake Dating", "Forced love", "Bully to Lover", "Vengeance & Betrayal", "College", "Class Difference", "Age Gap", "Childhood Crush", "First Love", "Love at First Sight", "Crush", "Unrequited Love", "Cheating", "Misunderstanding", "Office Romance", "One Night Stand", "Runaway", "Marriage", "Strong Female Lead", "Substitute", "Sweet Pampering", "Unattainable Love", "Love After Marriage", "Opposites Attract", "Love-Triangle", "Second Chance", "Polyamory", "Harem", "Reverse Harem", "Friends to Lovers", "Enemies to Lovers", "Abusers to Lovers", "Immortality", "Mind-reading", "Occupations", "Plot twist", "Power Struggles", "Reborn", "SF", "Sports Romance", "Status", "Steamy", "Destruction of engagement", "Domestic politics", "Face Slapping", "Female Growth", "Fling", "Gourmet", "Home drama", "Human drama", "Short stories", "Sports Star", "Strongest", "University student", "Western", "After Death", "Already late", "Bad villain", "Hero", "High school student", "Idol", "Level up", "Long piece", "Loss of memory", "Modern times", "Sad love", "A different world summon", "Adventurer", "Artificial intelligence", "Bad end", "Betrayal", "Dystopia", "Fantasy world", "Ghost story", "Growth", "Hard boiled"], "protagonist": ["Erotic", "Sensual", "Evil", "Rich", "Ruthless", "Rebel", "Forced", "Passionate", "Brave", "Independent", "Lonely", "Bold", "Tortured", "Forgiveness", "Nanny", "Motorcycle Club", "Boxer", "Dominant", "Crazy", "Sadistic", "Mean", "Sexy", "Seductive", "Goodgirl", "Girl Next Door", "Genius", "Roommates", "Neighbor", "Cruel", "Possessive", "Submissive", "Playboy", "Cold", "Confident", "Sunshine", "Cunning", "Arrogant", "Surrogate", "Sugar Baby", "Sugar Daddy", "Poor Girl", "Fake Bride", "Bankrupt Rich Girl", "Woman in Jeopardy", "Ex-wife", "Single Mother", "Single Daddy", "Stepmother", "Stepfather", "Stepbrother", "Nerd", "Bad Boy", "Badgirl", "Siren", "Stalker", "Psycho", "Doctor", "Nurse", "Professor", "Assasasin", "Killer", "Spy", "Murder", "Detective", "Police", "Hacker", "President", "Billionaire/CEO", "Secretary", "Virgin", "Pregnancy", "Royalty", "King", "Queen", "Prince", "Princess", "Maid", "Mafia Leader", "Strong-Muscled", "Bodyguard", "Athlete", "Rock Star", "Werebear", "Werecat", "Weredragon", "God", "Dragon", "Monster", "Demon", "Beast", "Priest", "Elves", "Witch", "Vampire", "Hunter", "Pure Blood", "Sassy Heroine", "Kickass Heroine", "Curvy Heroine", "Plain Heroine", "Mistaken Identity", "Hidden Identity", "Muti-Identity", "Werewolf", "Alpha", "Beta", "Omega", "Luna", "Hybrid", "Human Mate", "Heir", "Teenwolf", "Abandoned", "Alien", "Angel", "Captain", "Cowboy", "Wizard", "Female Lead", "Girl Power", "Goddess", "Hypocrisy", "Lovesick Fool", "Morally Grey Hero", "Scumbag", "True and Fake Heiress", "Strong Heroine", "Calm Protagonist"]};
+NS_LISTS.contest = ["None","Writers Class","Suspense Writing Contest","Edge of Suspense: Outline-to-Story Challenge","\"Beyond Reality\" Fantasy Writing Contest","YA writing contest","From Zero to Legend","The Hunted Truth: Suspense Writing Contest","Her Game, Her Glory: Female Athletes Writing Contest","Once Upon a Cozy Spell: Cozy Fantasy Writing Contest"];
+NS_LISTS.wordcount = ["Up to 100,000 words","100,000–150,000 words","150,000–200,000 words","200,000–300,000 words","Over 300,000 words"];
+const nsWordcount = n => n <= 100000 ? NS_LISTS.wordcount[0] : n <= 150000 ? NS_LISTS.wordcount[1] : n <= 200000 ? NS_LISTS.wordcount[2] : n <= 300000 ? NS_LISTS.wordcount[3] : NS_LISTS.wordcount[4];
 const nsPick = (vals, key, max) => {
   const allowed = NS_LISTS[key], norm = x => String(x).toLowerCase().replace(/[^a-z0-9]+/g,"");
   const out = [];
@@ -1328,15 +1335,37 @@ function renderPublish(p){
   $("pubGen").disabled = working || !sample;
   const d = p.publish;
   if(!d){ $("pubGrid").innerHTML = `<p class="note">${working ? "Writing the publishing details…" : "Press Generate to fill in the publishing details for this story."}</p>`; return; }
-  $("pubGrid").innerHTML = PUB_FIELDS.map(([k,label])=>{
-    const v = d[k]; if(v==null || (Array.isArray(v) && !v.length) || v==="") return "";
+  const row = (key, label, v, range, hint) => {
+    if(v==null || v==="" || (Array.isArray(v) && !v.length)) return "";
+    const long = !Array.isArray(v) && words(v) > 12;
     const html = Array.isArray(v) ? v.map(t=>`<span class="tag">${escHtml(t)}</span>`).join("") : escHtml(v);
-    return `<div class="pubrow"><span class="label">${escHtml(label)}${k==="description"?` · ${words(v)} words`:""}</span><div class="val${k==="description"?" desc":""}">${html}</div><button type="button" class="link" data-pub="${k}">Copy</button></div>`;
-  }).join("");
+    let wc = "";
+    if(range){ const n = words(v), bad = n < range[0] || n > range[1]; wc = ` <span class="wc${bad?" bad":""}">· ${n} words (${range[0]}–${range[1]})</span>`; }
+    return `<div class="pubrow"><span class="label">${escHtml(label)}${wc}</span>${hint?`<span class="hint">${escHtml(hint)}</span>`:""}<div class="val${long?" desc":""}">${html}</div><button type="button" class="link" data-pub="${escHtml(key)}">Copy</button></div>`;
+  };
+  const step1 = PUB_FIELDS.map(([k,label])=> row(k, label, d[k], k==="description" ? [10,300] : null)).join("");
+  const sb = d.sub;
+  let step2 = "", step3 = "";
+  if(sb){
+    step2 = row("sub.contest","Entry to our writing contest?", sb.contest, null, sb.contestWhy || "")
+      + row("sub.wordcount","Estimated total word count", sb.wordcount)
+      + row("sub.intro","Introduce your story in one sentence", sb.intro, [50,200])
+      + row("sub.main","Main story and ending direction", sb.main, [150,200])
+      + row("sub.different","What makes this story different", sb.different, [50,100])
+      + (sb.characters||[]).map((c,i)=> row(`sub.characters.${i}`, `Main character ${i+1}${i>1?" (+ Add character)":""}`, c, [100,150])).join("");
+    step3 = row("sub.beginning","The beginning of the story", sb.beginning, [200,300])
+      + row("sub.development","Development: story progression", sb.development, [300,500])
+      + row("sub.turning","Turning point: major reversal", sb.turning, [200,300])
+      + row("sub.ending","Climax and ending", sb.ending, [200,300]);
+  }
+  $("pubGrid").innerHTML = `<p class="pubstep">Step 1 · Story info</p>` + step1
+    + `<p class="pubstep">Step 2 · Story setup</p>` + (step2 || `<p class="note">${working ? "Writing…" : "Press Regenerate to fill in this step."}</p>`)
+    + `<p class="pubstep">Step 3 · Full outline</p>` + (step3 || `<p class="note">${working ? "Writing…" : "Press Regenerate to fill in this step."}</p>`);
 }
+const pubValue = (d, key) => key.split(".").reduce((o,k)=> o==null ? o : o[/^\d+$/.test(k) ? Number(k) : k], d);
 $("pubGrid").addEventListener("click", async e=>{
   const b = e.target.closest("button[data-pub]"); if(!b || !current.publish) return;
-  const text = pubText(current.publish[b.dataset.pub]);
+  const text = pubText(pubValue(current.publish, b.dataset.pub));
   try{ await navigator.clipboard.writeText(text); b.textContent = "Copied"; }
   catch{ const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = "Selected, press copy"; }
   setTimeout(()=>b.textContent = "Copy", 1600);
@@ -1374,6 +1403,78 @@ Fill every field so it matches this story exactly. For every field except descri
 Reply with only JSON:
 {"title":"${(plan.title||"").replace(/"/g,"'")}","channel":"","genre":"","world":[""],"tone":[""],"relationship":"","plot":[""],"protagonist":[""],"description":""}`;
 }
+function storyDigest(p){
+  const plan = p.plan || {};
+  const chapters = (plan.chapters||[]).map((c,i)=>{
+    const part = p.parts[i]; const t = cleanModelText(part?.text || "");
+    const sum = c.summary || part?.recap || "";
+    const excerpt = sum ? "" : `\n   Opening: "${t.slice(0,900).replace(/\s+/g," ")}"\n   Ending: "${t.slice(-700).replace(/\s+/g," ")}"`;
+    return `${i+1}. ${c.title}${sum?`: ${sum}`:""}${c.cliffhanger?` (ends on: ${c.cliffhanger})`:""}${excerpt}`;
+  }).join("\n");
+  const last = cleanModelText(p.parts[p.parts.length-1]?.text || "").slice(-2500);
+  return `Title: ${plan.title}
+Logline: ${plan.logline||""}
+Premise: ${plan.premise||""}
+Setting: ${plan.setting||""}
+Narrator: ${plan.pov||""}
+Characters: ${(plan.characters||[]).map(c=>`${c.name} (${c.role}${c.want?`; wants: ${c.want}`:""}${c.secret?`; secret: ${c.secret}`:""})`).join(" | ")}
+${(plan.dynamics||[]).length ? `Dynamics: ${plan.dynamics.map(d=>`${d.between}: ${d.tension}${d.shift?` (${d.shift})`:""}`).join(" | ")}\n` : ""}Twist: ${plan.twist?.reveal||"see chapters"}
+Chapters:
+${chapters}
+The last lines of the book:
+"""${last}"""`;
+}
+function submissionPrompt(p){
+  return `You are helping the author of this ${p.settings.format==="book"?"novel":"story"} fill in the NovelSnack submission form for editors. Editors read everything, so here you DO reveal the twist and the ending.
+
+${storyDigest(p)}
+
+Write the way the author would explain their own book to an editor over coffee: plain, specific, warm and natural. Use the characters' names, real places and concrete events from the story. Mix short and longer sentences. No marketing words (gripping, unforgettable, rollercoaster, captivating, journey, tapestry, delve, testament), no em dashes, no bullet points, no headings. Third person, present tense, except where a field says otherwise. Stay strictly within each word range.
+
+Fields:
+- contest: exactly one of: ${NS_LISTS.contest.join(" | ")}. Pick a contest only if the story clearly fits its theme (suspense, fantasy beyond reality, YA, female athletes, cozy fantasy, an underdog rising from zero); otherwise "None".
+- contestWhy: one short sentence explaining the choice, in French.
+- intro: ONE single sentence, 50 to 120 words: the protagonist's unusual situation, the person or problem they run into, and what must finally be resolved.
+- main: 150 to 200 words: what starts the story, what the protagonist wants, the main obstacles, and how the central problem is resolved and the story ends.
+- different: 50 to 100 words: one or two things that set this story apart from others in its genre (character identity, relationship, conflict, world or plot).
+- characters: the 2 or 3 most important characters, each one paragraph of 100 to 150 words, starting with their full name and age: identity, core traits, greatest desire, weakness or secret, and how they change from the opening to the ending.
+- beginning: 200 to 300 words: the protagonist's original situation, how the core characters enter, what disrupts everyday life, and how they get pulled into the central conflict.
+- development: 300 to 500 words: the major events after the opening in order, the characters' actions, new obstacles, rising conflict, and how the core relationship develops.
+- turning: 200 to 300 words: the event that changes the direction of the story, why it happens, its consequences, and how it forces the characters to change their goals, choices or relationship.
+- ending: 200 to 300 words: how the main conflict comes to a head and is resolved, the final choice each main character makes, and how the plot, character growth and core relationship conclude.
+
+Use blank lines between paragraphs in the longer fields. Reply with only JSON:
+{"contest":"","contestWhy":"","intro":"","main":"","different":"","characters":["",""],"beginning":"","development":"","turning":"","ending":""}`;
+}
+async function makeSubmission(p){
+  const r = await sample.json(submissionPrompt(p), { modelTier: p.settings.tier || "default", cache:false });
+  if(!r || typeof r !== "object" || !r.main || !r.beginning) throw {code:"invalid_json"};
+  const str = v => String(v ?? "").trim();
+  return { contest: nsPick(r.contest,"contest",1)[0] || "None", contestWhy: str(r.contestWhy), wordcount: nsWordcount(Math.max(totalWords(p), p.settings.words||0)),
+    intro: str(r.intro), main: str(r.main), different: str(r.different), characters: (Array.isArray(r.characters)?r.characters:[]).map(str).filter(Boolean).slice(0,3),
+    beginning: str(r.beginning), development: str(r.development), turning: str(r.turning), ending: str(r.ending) };
+}
+const SUB_RANGES = { intro:[50,200], main:[150,200], different:[50,100], beginning:[200,300], development:[300,500], turning:[200,300], ending:[200,300] };
+async function fixLengths(p){
+  const sb = p.publish?.sub; if(!sb) return;
+  const bad = {};
+  for(const [k,[lo,hi]] of Object.entries(SUB_RANGES)){ const n = words(sb[k]||""); if(n < lo || n > hi) bad[k] = {text: sb[k], words: n, target: `${lo}-${hi}`}; }
+  (sb.characters||[]).forEach((c,i)=>{ const n = words(c); if(n < 100 || n > 150) bad["character"+i] = {text:c, words:n, target:"100-150"}; });
+  if(!Object.keys(bad).length) return;
+  const r = await sample.json(`Adjust the length of each text below so its word count lands inside its target range (aim for the middle). Keep the meaning, the facts, the names and the natural, plain voice; add concrete story detail when lengthening, cut repetition when shortening. "intro" must stay one single sentence. Reply with only JSON mapping each key to its new text.
+
+${JSON.stringify(bad)}
+
+Facts you can draw on:
+${storyDigest(p).slice(0, 12000)}`, { modelTier: p.settings.tier || "default", cache:false }).catch(()=>null);
+  if(!r || typeof r !== "object") return;
+  for(const k of Object.keys(bad)){
+    const v = typeof r[k] === "string" ? r[k].trim() : (typeof r[k]?.text === "string" ? r[k].text.trim() : "");
+    if(!v) continue;
+    if(k.startsWith("character")) sb.characters[Number(k.slice(9))] = v; else sb[k] = v;
+  }
+  storeSave(p);
+}
 async function makePublish(p){
   if(!sample || !p.plan || coverBusy.has("pub:"+p.id)) return;
   coverBusy.add("pub:"+p.id); if(current===p) renderPublish(p);
@@ -1385,7 +1486,10 @@ async function makePublish(p){
       world: nsPick(arr(r.world,4),"world",2), tone: nsPick(arr(r.tone,6),"tone",3), relationship: nsPick(r.relationship,"relationship",1)[0] || "BXG",
       plot: nsPick(arr(r.plot,8),"plot",4), protagonist: nsPick(arr(r.protagonist,8),"protagonist",4), description: String(r.description).trim() };
     if(!p.publish.tone.length) p.publish.tone = ["Romance"];
-    storeSave(p);
+    storeSave(p); if(current===p) renderPublish(p);
+    p.publish.sub = await makeSubmission(p);
+    storeSave(p); if(current===p) renderPublish(p);
+    await fixLengths(p);
   } catch(e){ if(current===p && !busy) setStatus(e?.code==="invalid_json" ? "The publishing details came back garbled. Press Generate again." : errCopy(e),"err"); if(isFatal(e)) sample = null; }
   finally { coverBusy.delete("pub:"+p.id); if(current===p) renderPublish(p); }
 }
