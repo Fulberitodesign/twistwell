@@ -384,12 +384,13 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
           <div class="kitrow">
             <button type="button" class="btn small" id="newCover">New illustrated cover</button>
             <label class="upload" id="uploadLbl">Use my image<input type="file" id="upload" accept="image/png,image/jpeg,image/webp"></label>
+            <label class="check" id="photoTextLbl" style="font-size:13px"><input type="checkbox" id="photoText" checked><span>My image already shows the title and the signature</span></label>
             <button type="button" class="btn small" id="rmPhoto" hidden>Back to illustrated</button>
             <button type="button" class="btn small" id="dlCover" hidden>Download cover</button>
           </div>
           <div class="kitbox">
             <div class="kithead"><h4>Realistic cover image prompt</h4><button type="button" class="btn small" id="mkPrompt">Write prompt</button></div>
-            <p class="note" id="kitNote">Writes a detailed prompt for a clean, photographic cover with realistic characters taken from your story. Paste it into an image generator (Midjourney, Higgsfield, Ideogram, Firefly, DALL·E), then use the result above with "Use my image". The title is set on top for you, so the prompt asks for no text.</p>
+            <p class="note" id="kitNote">Writes a complete cover prompt from your story: realistic characters, a setting, the title and the signature “A NOVEL BY FAVFIDEL”. Paste it into an image generator (Midjourney, Higgsfield, Ideogram, Firefly, DALL·E), then add the result with “Use my image”. Image generators sometimes misspell words: check the title and the signature before you use it.</p>
             <div id="promptOut" hidden class="kitbox">
               <div class="kithead"><span class="label">Prompt</span><button type="button" class="link" data-copy="pPrompt">Copy</button></div>
               <textarea id="pPrompt" aria-label="Image prompt"></textarea>
@@ -512,7 +513,9 @@ function numWord(n, french){
   return n<20 ? u[n] : t[Math.floor(n/10)] + (n%10 ? "-"+u[n%10] : "");
 }
 const chapterLabel = (p,i) => (fr(p) ? "Chapitre " : "Chapter ") + numWord(i+1, fr(p));
-const kindLabel = p => fr(p) ? (p.settings.format==="book"?"Roman":"Nouvelle") : (p.settings.format==="book"?"A novel":"A short story");
+const AUTHOR = "FAVFIDEL";
+const BYLINE = `A Novel By ${AUTHOR}`;
+const kindLabel = p => BYLINE;
 function cleanModelText(t){
   return String(t||"").replace(/^\s*#+\s.*$/gm,"").replace(/\*\*(.+?)\*\*/g,"$1")
     .replace(/^\s*(?:\*\s*\*\s*\*|\*{3,}|#{3,}|-{3,}|⁂)\s*$/gm,"* * *").trim();
@@ -552,7 +555,7 @@ function sanitizeCover(c){
   const paths = (Array.isArray(c.paths)?c.paths:[]).slice(0,8).filter(x=>x && typeof x.d==="string" && x.d.length<5000 && PATH_OK.test(x.d))
     .map(x=>({d:x.d, fill:["ink","accent","bg2","bg"].includes(x.fill)?x.fill:"ink", opacity:Math.min(1,Math.max(.15,Number(x.opacity)||1)), rule:x.rule==="evenodd"?"evenodd":"nonzero"}));
   return { image:String(c.image||""), layout: COVER_LAYOUTS.includes(c.layout)?c.layout:"frame", font: COVER_FONTS[c.font]?c.font:"Playfair Display",
-    uppercase: !!c.uppercase, palette:pal, texture:["grain","lines","none"].includes(c.texture)?c.texture:"grain", tagline:String(c.tagline||"").slice(0,90), paths, photo: !!c.photo };
+    uppercase: !!c.uppercase, photoText: c.photoText !== false, palette:pal, texture:["grain","lines","none"].includes(c.texture)?c.texture:"grain", tagline:String(c.tagline||"").slice(0,90), paths, photo: !!c.photo };
 }
 function hash(s){ let h=2166136261; for(const ch of String(s)){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return h>>>0; }
 function rng(seed){ return ()=>{ seed|=0; seed=seed+0x6D2B79F5|0; let t=Math.imul(seed^seed>>>15,1|seed); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
@@ -601,20 +604,41 @@ async function drawCover(cv, p){
     const lh = size*1.02; lines.forEach((l,i)=>c.fillText(l, x, yTop + size*0.82 + i*lh));
     return yTop + size*0.82 + (lines.length-1)*lh;
   };
-  const drawKind = (x,y,color,align="center")=>{ c.font=`500 30px "IBM Plex Mono", monospace`; c.fillStyle=color; spaced(c,kind,x,y,9,align); };
-  const drawTag = (x,y,color,align="center",maxW=900)=>{ if(!s.tagline) return; c.fillStyle=color; c.textAlign=align;
+  const drawKind = ()=>{};   // the signature sits at the bottom now
+  const drawByline = (color, y=1700, align="center", x=W/2)=>{
+    c.save(); c.shadowColor="rgba(0,0,0,.35)"; c.shadowBlur=8;
+    const small = `600 34px "${fam}", Georgia, serif`, big = `${wt} 52px "${fam}", Georgia, serif`;
+    c.font = small; const sp = 7;
+    const w1 = [..."A NOVEL BY "].reduce((a,ch)=>a+c.measureText(ch).width+sp,0);
+    c.font = big; const w2 = [...AUTHOR].reduce((a,ch)=>a+c.measureText(ch).width+sp,0)-sp;
+    const total = w1 + w2, x0 = align==="center" ? x - total/2 : x;
+    c.fillStyle = color; c.font = small; spaced(c, "A NOVEL BY ", x0, y, sp, "left");
+    c.font = big; spaced(c, AUTHOR, x0 + w1, y + 2, sp, "left");
+    c.shadowBlur = 0; c.strokeStyle = color; c.lineWidth = 2; c.globalAlpha = .85;
+    if(align==="center"){
+      const gap = 28, len = Math.min(170, (W - total)/2 - gap - 70), mid = y - 16;
+      if(len > 30){
+        c.beginPath(); c.moveTo(x0 - gap - len, mid); c.lineTo(x0 - gap, mid); c.moveTo(x0 + total + gap, mid); c.lineTo(x0 + total + gap + len, mid); c.stroke();
+        for(const dx of [x0 - gap - len - 8, x0 + total + gap + len + 8]){ c.beginPath(); c.moveTo(dx, mid-6); c.lineTo(dx+6, mid); c.lineTo(dx, mid+6); c.lineTo(dx-6, mid); c.closePath(); c.fillStyle = color; c.fill(); }
+      }
+    }
+    c.restore();
+  };
+  const drawTag = (x,y,color,align="center",maxW=900)=>{ if(!s.tagline) return; y = Math.min(y, 1590); c.fillStyle=color; c.textAlign=align;
     const {lines}=wrapFit(c,s.tagline,"Literata","italic 400",maxW,2,40,30); c.font=`italic 400 38px "Literata", Georgia, serif`; lines.forEach((l,i)=>c.fillText(l,x,y+i*50)); };
 
   if(photo){
     const r = Math.max(W/photo.width, H/photo.height), iw = photo.width*r, ih = photo.height*r;
     c.drawImage(photo, (W-iw)/2, (H-ih)/2, iw, ih);
+    if(s.photoText){ return; }
     let g = c.createLinearGradient(0,0,0,760); g.addColorStop(0,"rgba(0,0,0,.62)"); g.addColorStop(1,"rgba(0,0,0,0)"); c.fillStyle=g; c.fillRect(0,0,W,760);
     g = c.createLinearGradient(0,1380,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,"rgba(0,0,0,.6)"); c.fillStyle=g; c.fillRect(0,1380,W,H-1380);
     c.shadowColor="rgba(0,0,0,.45)"; c.shadowBlur=18;
     drawKind(W/2,140,"#F3EBDD");
     drawTitle(W/2,190,W-200,"center","#FFFFFF",3,170);
-    drawTag(W/2,1700,"#F3EBDD");
+    drawTag(W/2,1590,"#F3EBDD");
     c.shadowColor="transparent"; c.shadowBlur=0;
+    drawByline("#F3EBDD", 1715);
   } else {
     if(s.layout==="split"){ c.fillStyle=pal.bg; c.fillRect(0,0,W,H/2); c.fillStyle=pal.bg2; c.fillRect(0,H/2,W,H/2); }
     else { const g=c.createLinearGradient(0,0,0,H); g.addColorStop(0,pal.bg); g.addColorStop(1,pal.bg2); c.fillStyle=g; c.fillRect(0,0,W,H); }
@@ -645,15 +669,16 @@ async function drawCover(cv, p){
         motif(W*0.56,760,1500,.6);
         { const g=c.createLinearGradient(0,900,0,H); g.addColorStop(0,"rgba(0,0,0,0)"); g.addColorStop(1,pal.bg2); c.fillStyle=g; c.globalAlpha=.9; c.fillRect(0,900,W,H-900); c.globalAlpha=1; }
         drawKind(100,160,pal.accent,"left");
-        { const {size,lines} = wrapFit(c,title,fam,wt,W-200,3,170,60); const lh=size*1.02; const top = 1560 - lines.length*lh;
+        { const {size,lines} = wrapFit(c,title,fam,wt,W-200,3,170,60); const lh=size*1.02; const top = 1470 - lines.length*lh;
           c.fillStyle=pal.ink; c.textAlign="left"; lines.forEach((l,i)=>c.fillText(l,100,top+size*.82+i*lh)); }
-        drawTag(100,1680,pal.accent,"left");
+        drawTag(100,1560,pal.accent,"left");
         break;
       case "split":
         drawKind(W/2,150,pal.accent); drawTitle(W/2,200,W-200,"center",pal.ink,2,150);
         motif(W/2,H/2+40,620); drawTag(W/2,1680,pal.ink);
         break;
     }
+    drawByline(s.layout==="bottom-band" ? pal.bg : s.layout==="frame" ? pal.accent : pal.ink, s.layout==="frame" ? 1665 : 1715, s.layout==="full-bleed-motif" ? "left" : "center", s.layout==="full-bleed-motif" ? 100 : W/2);
     const r = rng(hash(title));
     if(s.texture==="grain"){ for(let i=0;i<9000;i++){ c.globalAlpha=r()*.07; c.fillStyle = r()>.5 ? "#000" : "#fff"; c.fillRect(r()*W, r()*H, 2, 2); } }
     else if(s.texture==="lines"){ c.globalAlpha=.06; c.fillStyle=pal.ink; for(let y=0;y<H;y+=9) c.fillRect(0,y,W,1); }
@@ -682,7 +707,7 @@ Reply with only JSON:
 }
 function imagePromptRequest(p){
   const plan = p.plan, s = p.settings;
-  return `Write an image-generation prompt for a realistic, photographic front cover of this ${s.format==="book"?"novel":"short story"}. Write the prompt in English whatever the book's language.
+  return `Write an image-generation prompt for a complete, ready-to-publish front cover of this ${s.format==="book"?"novel":"story"}, in the style of today's best-selling commercial ebook covers (the kind that top the charts on Amazon Kindle, Wattpad, GoodNovel and Dreame). Write the prompt in English whatever the book's language.
 
 Title: ${plan.title}
 Genre: ${s.genre}
@@ -692,17 +717,18 @@ Hook: ${plan.hook||""}
 Characters: ${(plan.characters||[]).map(c=>`${c.name}, ${c.role}${c.speech?`; ${c.speech}`:""}`).join(" | ")}
 The twist, which the image must NOT give away: ${plan.twist?.reveal||""}
 
-What makes a good cover prompt:
-- One clean, striking scene from the story with one clear focal point. Simple, uncluttered background. Strong shape that reads at thumbnail size.
-- At most one or two people. They must look like real, ordinary people, not models: describe exact age, build, skin tone and features that fit the setting's country and era, hair, specific everyday clothing for their job and the period, posture and a natural, understated expression. Real skin texture, natural proportions, correct hands. Classic cover framing often shows a figure from behind, in profile, partly cropped, or at a distance, which keeps it clean and mysterious.
-- Specific real details of the place (architecture, street furniture, vehicles, objects) and the time of day.
-- Lighting and color that set the genre's mood, limited to 2 or 3 main colors.
-- Photography terms: camera angle, lens (for example 35mm or 50mm), depth of field, natural or cinematic light, subtle film grain.
-- Portrait 2:3 composition with calm empty space in the top third for the title and at the bottom for the author's name.
-- No text, letters, numbers, logos, watermarks, borders or frames anywhere in the image.
+What the prompt must describe:
+- Photorealistic, cinematic, high-end cover art, like a movie poster: sharp focus on the faces, real skin texture with pores, natural proportions, correct hands, dramatic professional lighting (rim light, warm/cool contrast), rich color grading.
+- The main character(s) of this story as realistic, attractive, clearly adult people, described precisely: age, ethnicity and features that fit the setting, hair, eyes, build, clothing that fits their role and the genre. Show the emotional tension between them (a protective embrace, a hand at the jaw, a near-kiss, a cold stare, a figure turned away), in a pose that makes people want to know what happens. Keep it suggestive at most, never explicit.
+- Behind them, ONE strong setting element from the story (a skyline, a castle, a moon, a lit window, a road at night) plus at most 2 or 3 props that tell the story (for a mafia story: a gun, a whisky glass, banknotes; for a werewolf story: wolves with glowing eyes). Rich but clean: not cluttered, one clear focal point, readable at thumbnail size.
+- Typography, part of the image, perfectly spelled:
+  - At the top: the title "${plan.title}" in large, bold, elegant letters suited to the genre (for example embossed metallic silver or gold serif with subtle sparkle, or glowing red for danger), with depth and a soft shadow.
+  - Optionally, under the title, a short subtitle in elegant script between thin ornamental dividers (write the subtitle text in the prompt; it must not give away the twist).
+  - At the bottom: "A NOVEL BY FAVFIDEL" in refined spaced serif capitals, with small ornamental lines on each side. This exact signature is required.
+- Portrait 2:3 format. No other text, no logos, no watermark, no border.
 
 Reply with only JSON:
-{"prompt":"one paragraph of 90 to 150 words, the full prompt","negative":"comma-separated list of things to avoid, including: text, letters, watermark, logo, border, extra fingers, deformed hands, distorted face, plastic or airbrushed skin, doll-like faces, oversaturated colors, cartoon, 3D render, CGI look, fantasy glow, cluttered background","scene":"which moment or image from the story this shows and why it works, one sentence"}`;
+{"prompt":"one paragraph of 130 to 200 words, the full prompt, including the exact title text and the exact words A NOVEL BY FAVFIDEL","subtitle":"the subtitle used, or empty","negative":"comma-separated list of things to avoid, including: misspelled text, extra text, gibberish letters, watermark, logo, border, extra fingers, deformed hands, distorted face, crossed eyes, plastic or airbrushed skin, cartoon, anime, 3D render, low resolution, blurry face, cluttered composition, nudity","scene":"which moment or image from the story this shows and why it makes people want to read, one sentence"}`;
 }
 
 /* ---------- example shown at rest ---------- */
@@ -929,7 +955,7 @@ function renderCover(p){
   $("mkPrompt").textContent = coverBusy.has("prompt:"+p.id) ? "Writing…" : p.imgPrompt ? "Write a new prompt" : "Write prompt";
   const ip = p.imgPrompt;
   $("promptOut").hidden = !ip;
-  if(ip){ $("pPrompt").value = ip.prompt||""; $("pNeg").value = ip.negative||""; $("pMj").value = `${ip.prompt||""} --ar 2:3 --style raw --no text, letters, watermark`; $("pNotes").textContent = ip.scene ? `Scene: ${ip.scene}` : ""; }
+  if(ip){ $("pPrompt").value = ip.prompt||""; $("pNeg").value = ip.negative||""; $("pMj").value = `${ip.prompt||""} --ar 2:3 --style raw --stylize 250 --no watermark, extra text, misspelled letters`; $("pNotes").textContent = ip.scene ? `Scene: ${ip.scene}` : ""; }
   if(has) drawCover($("coverCv"), p);
   $("coverCv").setAttribute("aria-label", has ? `Cover: ${p.cover.photo?"your image":p.cover.image||"book cover"}` : "Book cover");
 }
@@ -1505,6 +1531,10 @@ document.querySelector("#promptOut").addEventListener("click", async e=>{
   catch{ ta.focus(); ta.select(); b.textContent = "Selected, press copy"; }
   setTimeout(()=>b.textContent="Copy",1600);
 });
+$("photoText").addEventListener("change", ()=>{
+  const p = current; if(!p.cover?.photo || p.example) return;
+  p.cover.photoText = $("photoText").checked; storeSave(p); renderCover(p);
+});
 $("upload").addEventListener("change", async e=>{
   const file = e.target.files?.[0]; e.target.value = "";
   const p = current; if(!file || p.example || !p.plan) return;
@@ -1519,6 +1549,7 @@ $("upload").addEventListener("change", async e=>{
     p.coverImg = data;
     p.cover = p.cover || sanitizeCover({});
     p.cover.photo = true;
+    p.cover.photoText = $("photoText").checked;
     await storeSave(p,{img:true});
     renderCover(p); renderHistory(); setStatus("Your image is now the cover, with the title set on it");
   } catch { setStatus("That image couldn't be read. Try a JPG or PNG.","err"); }
