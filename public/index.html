@@ -430,6 +430,14 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
       <nav class="contents" id="contents" hidden><h3 id="contentsLabel">Contents</h3><ol id="toc"></ol></nav>
       <article class="prose" id="prose"></article>
       <p class="theend" id="theend" hidden>The End</p>
+      <details class="panel" id="gnpub" open hidden>
+        <summary>GoodNovel: genre and tags</summary>
+        <div class="panel-body">
+          <div class="pubhead"><p class="note">For the GoodNovel "Novel Information" screen. Every tag comes from the app's own Style, Character and Setting lists, picked to match this story and the tags readers search most. The priority list is the order to keep if the app limits how many tags you can add.</p>
+            <button type="button" class="btn small" id="gnGen">Generate</button></div>
+          <div class="pubgrid" id="gnGrid"></div>
+        </div>
+      </details>
       <details class="panel" id="pub" open hidden>
         <summary>Publishing details: the full NovelSnack form</summary>
         <div class="panel-body">
@@ -908,7 +916,7 @@ let db = null, uid = null;
 let history = [];   // project objects; chapter text may be unloaded (loaded:false)
 const writeChains = new Map();
 function queued(path, fn){ const prev = writeChains.get(path) || Promise.resolve(); const next = prev.catch(()=>{}).then(fn); writeChains.set(path, next); return next; }
-const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, publish:p.publish||null, hasImg:!!p.coverImg,
+const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, publish:p.publish||null, gn:p.gn||null, hasImg:!!p.coverImg,
   parts:p.parts.map(x=>x?({done:!!x.done,segDone:x.segDone||0,recap:x.recap||"",words:partWords(x)}):null), created:p.created, updated:p.updated });
 function lsSave(){
   try{
@@ -963,7 +971,7 @@ async function storeDelete(p){
   try{ await Promise.all(jobs); }catch{}
 }
 function fromMeta(m){
-  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, publish:m.publish||null, hasImg:!!m.hasImg, coverImg:null,
+  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, publish:m.publish||null, gn:m.gn||null, hasImg:!!m.hasImg, coverImg:null,
     parts:(m.parts||[]).map(x=>x?({...x, text:undefined}):null), created:m.created||0, updated:m.updated||0, loaded:false };
 }
 function readLocal(){
@@ -1437,6 +1445,7 @@ const nsPick = (vals, key, max) => {
 };
 const pubText = v => Array.isArray(v) ? v.join(", ") : String(v ?? "");
 function renderPublish(p){
+  try{ renderGN(p); }catch(e){ console.error(e); }
   const show = !!p.plan && !p.example && (isComplete(p) || !!p.publish);
   $("pub").hidden = !show;
   if(!show) return;
@@ -1604,6 +1613,95 @@ async function makePublish(p){
   finally { coverBusy.delete("pub:"+p.id); if(current===p) renderPublish(p); }
 }
 $("pubGen").addEventListener("click", ()=>{ if(current.plan && !current.example) makePublish(current); });
+
+
+/* ---------- GoodNovel: genre and tags (lists copied from the GoodNovel app) ---------- */
+const GN_LISTS = {
+  genre: ["Romance","Werewolf","Mafia","Fantasy","Urban","Paranormal","Mystery/Thriller","YA/TEEN","Vampire","System","Apocalypse","Eastern","Games","History","Sci-Fi","War","LGBTQ+","MM Romance","Emotional Realism","Mythology","Campus","Rebirth","Folklore Mystery","Male POV","Other"],
+  style: ["Action","Adventurous","Comedy","Contemporary","Dark Romance","Drama","Eastern","Fast-Paced Plot","First-Person POV","Girl Power","Mystery","Sweet Love","Third-Person POV","Tragedy","Werewolf","Xianxia","Familial Bond","Exclusive Love","Survival Game","Finance","Fake and Real Heir","Winning Back the Wife","Prison Break","Mecha","Witch"],
+  character: ["Actor / Actress","Agent","Alpha","Angel","Arrogant","Artist","Badboy","Badgirl","Beast","Beta","Bully","CEO","Demon","Detective","Doctor","Dominant","Dragon","Gamer","Genius Baby","Golden Boy","Goodgirl","Heir/Heirness","Hero/Heroin","Hidden Identity","Hunter","Hybrid","Independent","Intelligent","Lawyer","Luna","Lycan","Mafia","Medical Genius","Nanny","Omega","Playboy","Police","Professor","Rebel","Rogue","Ruthless","Secretary","Slave","Star","Teenager","Triplets","Twins","Vampire","Warrior","Witch / Wizard","God of War","Beastman","Widow","Possessive","Protective","Optimism","Victim","Paranoid","Decisive","Brave","Sister-in-law"],
+  setting: ["Affair","Age Gap","Alternate Universe","Apocalypse","Betrayal","Blind Date","Campus","Contract Marriage","Cultivation","Divorce","Face-Slapping","First Love","Flash Marriage","Forbidden Love","Forgiveness","Gay for you","God of War","Golden Finger","Harem","Hate to Love","Immortal Hero","Incredible Son-in-Law","Instant Billionaire","Kingdom Building","Level up","Lit-RPG","Love after Marriage","Love at First Sight","Love-Triangle","Lovers Reunion","Misunderstanding","MxM","Office Relationship","Pregnant","Reborn","Regret","Reject","Revenge","Reverse Harem","Royal","Second Chance","Secret Love","Sports","Substitute Bride","Superpower","Twist","Twisted","Weak to Strong","Substitute","System","Pampered by All","Post-apocalyptic","Succubus","Terminal Illness Countdown","Death Countdown"]
+};
+const gnPick = (vals, key, max) => {
+  const allowed = GN_LISTS[key], norm = x => String(x).toLowerCase().replace(/[^a-z0-9]+/g,"");
+  const out = [];
+  const fix = x => norm(x).replace("heiress","heirness").replace("heroine","heroin");
+  for(const v of (Array.isArray(vals) ? vals : [vals])){
+    const hit = allowed.find(a => norm(a) === fix(v));
+    if(hit && !out.includes(hit)) out.push(hit);
+    if(out.length >= max) break;
+  }
+  return out;
+};
+function gnPrompt(p){
+  const plan = p.plan || {}, s = p.settings;
+  const outline = (plan.chapters||[]).map((c,i)=>`${i+1}. ${c.title}${c.summary?`: ${c.summary}`:""}`).join("\n");
+  return `You choose the genre and tags for this ${s.format==="book"?"novel":"story"} on GoodNovel, so the app shows it to the readers who want exactly this kind of book. Tags must be TRUE to the story (a tag the book doesn't deliver makes readers drop it) and, among the true ones, prefer the tropes GoodNovel readers search most (for werewolf: Alpha, Luna, Reject, Regret, Second Chance; for billionaire: CEO, Divorce, Contract Marriage, Pregnant, Regret, Face-Slapping...).
+
+Title: ${plan.title}
+Genre chosen by the writer: ${s.genre}
+Narration: first person ("I")
+Logline: ${plan.logline||""}
+Setting: ${plan.setting||""}
+Characters: ${(plan.characters||[]).map(c=>`${c.name} (${c.role}${c.secret?`; hides: ${c.secret}`:""})`).join(" | ")}
+Twist: ${plan.twist?.reveal||"not stated"}
+Outline:
+${outline.slice(0, 9000)}
+
+Copy every option exactly as written from these lists, nothing else:
+- genre (one): ${GN_LISTS.genre.join(" | ")} (the most specific that fits, e.g. Werewolf or Mafia before Romance)
+- style, 3 to 5 from: ${GN_LISTS.style.join(" | ")} (always include First-Person POV, since the book is told in the first person)
+- character, 4 to 8 from: ${GN_LISTS.character.join(" | ")} (describe the heroine and the male lead)
+- setting, 5 to 10 from: ${GN_LISTS.setting.join(" | ")}
+- priority: the 10 most important tags from your style, character and setting picks together, best first, for when the app limits the number of tags.
+- why: two or three short sentences in French explaining the choice to the author.
+
+Reply with only JSON: {"genre":"","style":[""],"character":[""],"setting":[""],"priority":[""],"why":""}`;
+}
+async function makeGN(p){
+  if(!sample || !p.plan || coverBusy.has("gn:"+p.id)) return;
+  coverBusy.add("gn:"+p.id); if(current===p) renderGN(p);
+  try{
+    const r = await sample.json(gnPrompt(p), { modelTier: "default", cache:false });
+    if(!r || typeof r !== "object") throw {code:"invalid_json"};
+    const arr = v => (Array.isArray(v) ? v : String(v||"").split(/,\s*/)).map(x=>String(x).trim()).filter(Boolean);
+    const style = gnPick(arr(r.style),"style",5), character = gnPick(arr(r.character),"character",8), setting = gnPick(arr(r.setting),"setting",10);
+    if(!style.includes("First-Person POV")) style.unshift("First-Person POV");
+    const all = [...style, ...character, ...setting];
+    const priority = arr(r.priority).map(x => all.find(a => a.toLowerCase() === x.toLowerCase())).filter((x,i,a)=> x && a.indexOf(x)===i).slice(0,10);
+    p.gn = { genre: (GN_LISTS.genre.find(g=>g.toLowerCase()===String(r.genre||"").toLowerCase().trim()) || (/werewolf|wolf|alpha/i.test(p.settings.genre) ? "Werewolf" : /mafia/i.test(p.settings.genre) ? "Mafia" : "Romance")),
+      style, character, setting, priority: priority.length ? priority : all.slice(0,10), why: String(r.why||"").trim() };
+    storeSave(p);
+  } catch(e){ if(current===p && !busy) setStatus(e?.code==="invalid_json" ? "The GoodNovel tags came back garbled. Press Generate again." : errCopy(e),"err"); if(isFatal(e)) sample = null; }
+  finally { coverBusy.delete("gn:"+p.id); if(current===p) renderGN(p); }
+}
+function renderGN(p){
+  const show = !!p.plan && !p.example;
+  $("gnpub").hidden = !show; if(!show) return;
+  const working = coverBusy.has("gn:"+p.id);
+  $("gnGen").textContent = working ? "Choosing…" : p.gn ? "Regenerate" : "Generate";
+  $("gnGen").disabled = working || !sample;
+  const g = p.gn;
+  if(!g){ $("gnGrid").innerHTML = `<p class="note">${working ? "Choosing the genre and tags…" : "Press Generate to pick the GoodNovel genre and tags for this story."}</p>`; return; }
+  const row = (key, label, v) => {
+    if(!v || (Array.isArray(v) && !v.length)) return "";
+    const html = Array.isArray(v) ? v.map(t=>`<span class="tag">${escHtml(t)}</span>`).join("") : escHtml(v);
+    return `<div class="pubrow"><span class="label">${escHtml(label)}</span><div class="val">${html}</div><button type="button" class="link" data-gn="${escHtml(key)}">Copy</button></div>`;
+  };
+  $("gnGrid").innerHTML = row("type","Novel Type","Original") + row("genre","Genre", g.genre)
+    + row("style","Tags · Style", g.style) + row("character","Tags · Character", g.character) + row("setting","Tags · Setting", g.setting)
+    + row("priority","Priority (if the app limits tags)", g.priority)
+    + (g.why ? `<p class="note">${escHtml(g.why)}</p>` : "");
+}
+$("gnGrid").addEventListener("click", async e=>{
+  const b = e.target.closest("button[data-gn]"); if(!b || !current.gn) return;
+  const v = b.dataset.gn === "type" ? "Original" : current.gn[b.dataset.gn];
+  const text = Array.isArray(v) ? v.join(", ") : String(v||"");
+  try{ await navigator.clipboard.writeText(text); b.textContent = "Copied"; }
+  catch{ const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = "Selected, press copy"; }
+  setTimeout(()=>b.textContent = "Copy", 1600);
+});
+$("gnGen").addEventListener("click", ()=>{ if(current.plan && !current.example) makeGN(current); });
 
 /* ---------- make it mine: import and rewrite in the first person ---------- */
 const NUMWORDS = "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|dix-sept|dix-huit|dix-neuf|vingt|premier|première|1er";
