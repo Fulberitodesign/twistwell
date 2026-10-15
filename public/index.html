@@ -77,6 +77,8 @@ select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-vis
 .ideas{display:flex;flex-direction:column;gap:6px}
 .ideas button{text-align:left;font-family:var(--prose);font-size:13.5px;line-height:1.45;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer}
 .ideas button:hover{border-color:var(--accent)}
+.ideas button b{display:block;font-family:var(--display);font-size:14px;margin-bottom:2px}
+.ideas button small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--brass);margin-top:4px;text-transform:uppercase}
 .actions{display:flex;gap:10px}
 .btn{font:inherit;font-size:15px;font-weight:500;border-radius:6px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1}
@@ -251,11 +253,18 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
       </fieldset>
 
       <fieldset>
+        <div class="field">
+          <label class="label" for="style">Style</label>
+          <select id="style"><option value="goodnovel" selected>Web novel hit (GoodNovel, NovelSnack…)</option><option value="literary">Literary (quiet, original)</option></select>
+        </div>
         <div class="row2">
           <div class="field">
             <label class="label" for="genre">Genre</label>
             <select id="genre">
-              <option>Literary</option><option>Psychological thriller</option><option selected>Mystery</option><option>Crime</option><option>Horror</option><option>Science fiction</option><option>Fantasy</option><option>Romance</option><option>Family drama</option><option>Dark comedy</option>
+              <optgroup label="Web novel hits"><option selected>Werewolf romance</option><option>Billionaire romance</option><option>Mafia romance</option><option>Dark romance</option><option>Contemporary romance</option><option>Paranormal romance</option><option>Fantasy romance</option><option>YA / campus romance</option></optgroup>
+              <optgroup label="Other">
+              <option>Literary</option><option>Psychological thriller</option><option>Mystery</option><option>Crime</option><option>Horror</option><option>Science fiction</option><option>Fantasy</option><option>Romance</option><option>Family drama</option><option>Dark comedy</option>
+              </optgroup>
             </select>
           </div>
           <div class="field">
@@ -270,7 +279,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
         <div class="field">
           <div class="premise-head">
             <label class="label" for="premise">Premise (optional)</label>
-            <div class="links"><button type="button" class="link" id="seed">Random</button><button type="button" class="link" id="ideasBtn">Suggest 3</button></div>
+            <div class="links"><button type="button" class="link" id="hitsBtn">Hit ideas</button><button type="button" class="link" id="seed">Random</button><button type="button" class="link" id="ideasBtn">Suggest 3</button></div>
           </div>
           <textarea id="premise" placeholder="Leave empty and the writer will invent one."></textarea>
           <div class="ideas" id="ideas" hidden></div>
@@ -476,7 +485,7 @@ function voiceRules(s){
 - Memories surface naturally, set off by an object, a word or a place, then the story moves on.
 - I only know what I saw, heard, was told or can guess. Other people's minds are read through their faces, hands and silences.
 - Admissions and private details a person would only write down for themselves.
-- Still show more than tell: no speeches about feelings, no lessons, no melodrama.`;
+- Still show more than tell: no speeches about feelings, no lessons${isGN(s) ? "; big emotions are fine when they come through action, dialogue and the body" : ", no melodrama"}.`;
 }
 
 const TWIST_RULES = `The twist must play fair:
@@ -495,6 +504,47 @@ const HOOK_RULES = `Hook and cliffhangers:
 - The next chapter must deal with that cliffhanger's consequence. It may delay it briefly, but never skip or ignore it.`;
 
 const PREMISE_RULES = `A good premise sounds like something a person would tell a friend over coffee: plain words, one or two sentences, ordinary people with real jobs and money worries, a real place, and one odd, concrete detail that makes you want to know more. Grounded in everyday life. Nothing supernatural unless the genre is horror, fantasy or science fiction, and even then keep it close to ordinary life. Avoid: chosen ones, mysterious strangers, "discovers a secret that changes everything", tech-company or AI plots, small towns "with a dark past", dramatic adjectives.`;
+
+/* What tops GoodNovel / NovelSnack (studied from their charts, October 2026) */
+const GN_TITLE_RULES = `Titles: use the formulas that top GoodNovel and NovelSnack charts. Name the hero's role and the heroine's situation, and promise the emotional payoff. Proven shapes: "The Alpha's Contract", "The Wife He Threw Away", "Divorced While Pregnant: The Billionaire's Regret", "Second Chance for the Barren Luna", "Rejected at the Moon Ceremony", "The Don's Collateral Bride", and for short stories a first-person line like "After My Death, I Stopped Being His Shadow". Role words readers search for are welcome: Alpha, Luna, Lycan King, Billionaire, CEO, Don, Mafia, Ex-Wife, Heiress, Contract, Rejected, Regret. 3 to 9 words, a colon subtitle is fine. Make it specific to THIS story and never copy an existing title.`;
+const GN_PREMISE_RULES = `Premise: high-concept and emotional, in one or two plain sentences, the way the best-selling web novels open. A heroine who has just been wronged in a big, public way (rejected by her mate, betrayed on her wedding day, divorced while pregnant, framed, sold to pay a debt, replaced by a sister or a first love), and a powerful man (Alpha, Lycan King, billionaire CEO, mafia don) bound to her by a contract, a mate bond, a secret child or a debt. Give her a hidden identity, gift or strength she will reveal later, and make the payoff readers will wait for obvious: his regret, her revenge, her rise, a second chance. Specific names and a real place; no vague "dark secret".`;
+const GN_MARKET_RULES = `What web-novel readers came for (GoodNovel, NovelSnack, Dreame):
+- Chapter 1 opens inside the heroine's worst moment (the rejection in front of the pack, the divorce papers on the table, the betrayal she walks in on) within the first three paragraphs. No slow setup.
+- Fast pace: every chapter changes something. Short scenes, lots of dialogue, confrontations in public.
+- Deliver the emotional payoffs readers wait for, chapter after chapter: the people who wronged her are proved wrong in front of others, the hero's jealousy, protectiveness and growing obsession, his regret when he learns the truth, her hidden worth revealed, sizzling tension that builds slowly (kept suggestive, never explicit), and justice at the end.
+- The heroine goes from weak to strong. She can be hurt, but never stays passive for long; she makes bold choices.
+- Big emotions are welcome here, as long as they are shown through concrete action, dialogue and the body, not purple prose.
+- Every chapter ends on a hook that forces the next tap.`;
+const GN_IDEAS = [
+  {title:"Rejected at the Moon Ceremony: The Alpha's Regret", genre:"Werewolf romance", ch:20, per:2000,
+   premise:"On the night Mara Hale is to be named Luna of the Black Ridge pack, Alpha Kade Mercer rejects her in front of everyone because the healer's test says she can never give him an heir. Three years later she returns as the Lycan King's royal healer, sent to save Kade's dying pack, with a silver-eyed little boy holding her hand.",
+   twist:"The fertility test was switched by Kade's own mother, because Mara's blood would have revealed she is the lost daughter of the Alpha the old Luna had killed."},
+  {title:"The Divorce Papers He Never Signed", genre:"Billionaire romance", ch:20, per:2000,
+   premise:"On their third anniversary, Elena Ward finds divorce papers on the breakfast table, the morning after her billionaire husband's first love comes back to New York. She signs, walks out pregnant and tells no one. Five years later she is the architect his company needs to win the biggest deal of his life, under a name he doesn't know.",
+   twist:"Dominic never sent the papers. His assistant forged them, paid by his mother, and he has spent five years searching for a wife he believes walked out on him."},
+  {title:"The Don's Collateral Bride", genre:"Mafia romance", ch:20, per:2000,
+   premise:"To pay her father's gambling debt, ER nurse Gia Russo has thirty days to marry Luca Moretti, the Chicago don whose bullet wound she once stitched without asking questions.",
+   twist:"Luca isn't the man her father owes. He married her to hide her from the real creditor, her own uncle, who built her father's debts to get his hands on the building in Gia's name."},
+  {title:"365 Days as the Lagos Billionaire's Wife", genre:"Billionaire romance", ch:20, per:2000,
+   premise:"Adaeze Okafor waits tables at a Lekki restaurant to pay for her mother's dialysis, until billionaire Tobi Adeyemi offers her a one-year marriage contract and enough money to save her mum, on one condition: his grandmother must believe it's real.",
+   twist:"His grandmother chose Adaeze herself. Adaeze was switched at birth with the spoiled heiress Tobi was meant to marry, and the contract was the old woman's way of bringing the real heiress home."},
+  {title:"I Died on Our Fifth Anniversary. This Time, I Leave First", genre:"Billionaire romance", ch:10, per:1500,
+   premise:"Claire died alone in a hospital bed while her CEO husband sat upstairs beside his first love. She wakes up a year earlier, on the morning of their fifth anniversary, and quietly starts preparing her divorce, her career and her exit.",
+   twist:"The crash that killed her was no accident, and the first love he chose over her is the one who paid for it."},
+  {title:"The Lycan King's Human Maid", genre:"Werewolf romance", ch:20, per:2000,
+   premise:"Nora is a human maid in the Lycan King's castle and the only person who can stay in the room when King Rhys loses control on the full moon, because her scent calms his wolf. Nobody knows why, least of all her.",
+   twist:"Nora isn't human. She is the last moon-blessed she-wolf, hidden as a baby behind a wolfsbane charm she has worn all her life, the same charm the king's council is searching every pack for."},
+  {title:"Fake Dating the Hockey Captain Who Hates Me", genre:"YA / campus romance", ch:15, per:1800,
+   premise:"When her ex posts photos with her best friend, college junior Maya Brooks makes a deal with Jake Reyes, the hockey captain who has hated her since freshman year: six weeks of fake dating, his grades in her tutoring hands, her revenge on his arm.",
+   twist:"Jake never hated her. Freshman year he covered for the cheating scandal that would have cost Maya her scholarship, and her ex was the one who started it."},
+  {title:"Left at the Altar, I Married His Billionaire Uncle", genre:"Dark romance", ch:20, per:2000,
+   premise:"Left at the altar in front of three hundred guests, Sofia Lane says yes that same night to Adrian Kane, the billionaire uncle her fiancé fears most, and becomes his aunt by marriage.",
+   twist:"Adrian didn't marry her for revenge. He paid her fiancé to leave, after discovering the groom was marrying Sofia only to get her late father's shares."}
+];
+const isGN = s => (s?.style || "goodnovel") === "goodnovel";
+const titleRules = s => isGN(s) ? GN_TITLE_RULES : TITLE_RULES;
+const premiseRules = s => isGN(s) ? GN_PREMISE_RULES : PREMISE_RULES;
+const marketRules = s => isGN(s) ? GN_MARKET_RULES : "";
 
 const SEEDS = [
   "A night-shift pharmacist keeps filling prescriptions for a man she's fairly sure died last spring.",
@@ -1140,7 +1190,7 @@ function readSettings(){
     chapters: Math.round(Number($("chapters").value)),
     words: Math.round(Number($("words").value)),
     delivery: document.querySelector('input[name="delivery"]:checked').value,
-    genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
+    style:$("style").value, twistIdea: chosenTwist, genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
     pov:$("pov").value.trim(), gender:$("gender").value, lang:$("lang").value, tier:$("tier").value
   };
 }
@@ -1179,10 +1229,20 @@ document.querySelectorAll('input[name="format"]').forEach(r=>r.addEventListener(
 $("presets").addEventListener("click", e=>{ const b = e.target.closest("button[data-w]"); if(!b) return; $("words").value = b.dataset.w; $("perch").value = Math.round(Number(b.dataset.w)/Math.max(1,num("chapters"))); updateCalc(); });
 
 /* ---------- premises ---------- */
+let chosenTwist = "";
+$("premise").addEventListener("input", ()=>{ chosenTwist = ""; });
+$("hitsBtn").addEventListener("click", ()=>{
+  $("ideas").hidden = false;
+  $("ideas").innerHTML = GN_IDEAS.map((g,i)=>`<button type="button" data-hit="${i}"><b>${escHtml(g.title)}</b>${escHtml(g.premise)}<small>${escHtml(g.genre)} · ${g.ch} chapters · twist ready</small></button>`).join("");
+});
 $("seed").addEventListener("click", ()=>{
   const cur = $("premise").value; let s;
+  if($("style").value === "goodnovel"){
+    let g; do { g = GN_IDEAS[Math.floor(Math.random()*GN_IDEAS.length)]; } while(g.premise===cur);
+    $("premise").value = g.premise; $("genre").value = g.genre; chosenTwist = g.twist; $("ideas").hidden = true; return;
+  }
   do { s = SEEDS[Math.floor(Math.random()*SEEDS.length)]; } while(s===cur);
-  $("premise").value = s; $("ideas").hidden = true;
+  $("premise").value = s; chosenTwist = ""; $("ideas").hidden = true;
 });
 $("ideasBtn").addEventListener("click", async ()=>{
   if(busy || !sample) return;
@@ -1192,9 +1252,9 @@ $("ideasBtn").addEventListener("click", async ()=>{
   try{
     const list = await sample.json(`Suggest 3 different premises for a ${s.genre.toLowerCase()} ${s.format==="book"?"novel":"story"} that will have a twist (type: ${s.twist}). Write them in ${s.lang}.
 
-${PREMISE_RULES}
+${premiseRules(s)}
 
-Each premise is at most 35 words, opens with a hook, and must not reveal the twist. Make the three feel different from each other in place, job and situation.
+Each premise is at most 45 words, opens with a hook, and must not reveal the twist. Make the three feel different from each other in place, job and situation.
 Reply with only a JSON array of 3 strings.`, { modelTier:"default", cache:false });
     const ideas = (Array.isArray(list) ? list : []).filter(x=>typeof x==="string").slice(0,3);
     if(!ideas.length) throw {code:"invalid_json"};
@@ -1204,7 +1264,16 @@ Reply with only a JSON array of 3 strings.`, { modelTier:"default", cache:false 
     if(isFatal(e)) sample = null;
   } finally { updateTools(); }
 });
-$("ideas").addEventListener("click", e=>{ const b = e.target.closest("button"); if(!b) return; $("premise").value = b.textContent; $("ideas").hidden = true; });
+$("ideas").addEventListener("click", e=>{
+  const b = e.target.closest("button"); if(!b) return;
+  if(b.dataset.hit != null){
+    const g = GN_IDEAS[Number(b.dataset.hit)];
+    $("style").value = "goodnovel"; $("genre").value = g.genre; $("premise").value = g.premise; chosenTwist = g.twist;
+    $("fmt-book").checked = true; $("chapters").value = g.ch; $("perch").value = g.per; $("words").value = g.ch * g.per; $("del-one").checked = true;
+    updateCalc();
+  } else { $("premise").value = b.textContent; chosenTwist = ""; }
+  $("ideas").hidden = true;
+});
 
 /* ---------- prompts ---------- */
 function planPrompt(s){
@@ -1217,9 +1286,10 @@ Genre: ${s.genre}
 Twist type: ${s.twist}
 Narration: first person ("I"). The narrator is ${s.pov || "the main character (the writer's choice)"}${s.gender?`, ${s.gender}`:""}. Make the narrator the first entry in "characters".
 Language of every field and of the final text: ${s.lang}
-Premise from the writer: ${s.premise || "None. Invent one."}
+Premise from the writer: ${s.premise || "None. Invent one."}${s.twistIdea ? `
+Twist the writer wants (keep it secret from the reader until its chapter): ${s.twistIdea}` : ""}
 
-${PREMISE_RULES}
+${premiseRules(s)}
 If the writer gave a premise, keep it and only sharpen it into that plain, natural form.
 
 ${NAME_RULES}
@@ -1233,7 +1303,9 @@ ${voiceRules(s)}
 ${TWIST_RULES}
 Before choosing the twist, think of the one most readers would guess, then pick one they won't that still fits every clue. Plant clues across the early and middle chapters.
 
-${TITLE_RULES}
+${titleRules(s)}
+
+${marketRules(s)}
 
 Structure: a clear shape with rising stakes. Each chapter has a goal, an obstacle, a turn that changes the situation, and (except the last) a cliffhanger that the next chapter must pick up. Characters keep the same names, ages, jobs and facts throughout. Ground it in a real, specific place and time.
 
@@ -1297,6 +1369,8 @@ ${ending}${twistNote}
 Keep the character dynamics from the bible alive in every scene.
 
 ${HOOK_RULES}
+
+${marketRules(s)}
 
 ${voiceRules(s)}
 
@@ -1398,7 +1472,7 @@ Fill every field so it matches this story exactly. For every field except descri
 - relationship, exactly 1 from: ${NS_LISTS.relationship.join(" | ")} (BXG = a man and a woman; Family Emotions = the core is family, not a couple)
 - plot, up to 4 from: ${NS_LISTS.plot.join(" | ")}
 - protagonist, up to 4 from (describe the male lead and the female lead): ${NS_LISTS.protagonist.join(" | ")}
-- description: 150 to 250 words (never more than 300), written in the same language as the story, told by the narrator in the first person ("I"). It must make people need to read the whole book: open with a concrete, startling first line, set up who I am and what I want in a few plain sentences, raise the stakes and the central question, give one or two specific moments that make the reader feel something, then end on a sharp unanswered question or a cliffhanger line. Short paragraphs separated by blank lines. Natural, human wording: no clichés, no "little did I know", no hashtags, no emojis, no spoilers of the twist or the ending.
+- description: 150 to 250 words (never more than 300), written in the same language as the story, ${isGN(p.settings) ? `in the third person, the way top GoodNovel blurbs are written: the very first sentence names the heroine and the wound that breaks her life open (for example "Lola always assumed her boyfriend was her mate. On his 18th birthday, her world comes crumbling down."), then the powerful man and the bond, contract or secret that ties them, then the stakes` : `told by the narrator in the first person ("I")`}. It must make people need to read the whole book: open with a concrete, startling first line, set up who the heroine is and what she wants in a few plain sentences, raise the stakes and the central question, give one or two specific moments that make the reader feel something, then end on a sharp unanswered question or a cliffhanger line. Short paragraphs separated by blank lines. Natural, human wording: no clichés, no "little did I know", no hashtags, no emojis, no spoilers of the twist or the ending.
 
 Reply with only JSON:
 {"title":"${(plan.title||"").replace(/"/g,"'")}","channel":"","genre":"","world":[""],"tone":[""],"relationship":"","plot":[""],"protagonist":[""],"description":""}`;
