@@ -77,6 +77,7 @@ select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-vis
 .ideas{display:flex;flex-direction:column;gap:6px}
 .ideas button{text-align:left;font-family:var(--prose);font-size:13.5px;line-height:1.45;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer}
 .ideas button:hover{border-color:var(--accent)}
+.ideas button.top{border-color:var(--brass);border-width:2px}
 .ideas button b{display:block;font-family:var(--display);font-size:14px;margin-bottom:2px}
 .ideas button small{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--brass);margin-top:4px;text-transform:uppercase}
 .actions{display:flex;gap:10px}
@@ -516,18 +517,48 @@ const GN_MARKET_RULES = `What web-novel readers came for (GoodNovel, NovelSnack,
 - Big emotions are welcome here, as long as they are shown through concrete action, dialogue and the body, not purple prose.
 - Every chapter ends on a hook that forces the next tap.`;
 const GN_IDEAS = [
-  {title:"Rejected at the Moon Ceremony: The Alpha's Regret", genre:"Werewolf romance", ch:60, per:1000,
+  {top:true, title:"Rejected at the Moon Ceremony: The Alpha's Regret", genre:"Werewolf romance", ch:60, per:1000, pov:"Mara Hale, the rejected healer", gender:"a woman",
    premise:"On the night Mara Hale is to be named Luna of the Black Ridge pack, Alpha Kade Mercer rejects her in front of everyone because the healer's test says she can never give him an heir. Three years later she returns as the Lycan King's royal healer, sent to save Kade's dying pack, with a silver-eyed little boy holding her hand.",
-   twist:"The fertility test was switched by Kade's own mother, because Mara's blood would have revealed she is the lost daughter of the Alpha the old Luna had killed."},
-  {title:"The Divorce Papers He Never Signed", genre:"Billionaire romance", ch:60, per:1000,
+   twist:"The fertility test was switched by Kade's own mother, because Mara's blood would have revealed she is the lost daughter of the Silver Fen Alpha and Luna the old Luna had killed.",
+   hooks:["Kade rejects Mara at the ceremony; she leaves that night. Ends: alone in the forest, she recognises the signs. She is pregnant.",
+    "Three years later at the Lycan King's court, she refuses the mission. Ends: the King tells her Kade asked for any healer but her.",
+    "She arrives at Black Ridge with her son Leo. Ends: Kade's wolf knows the boy's scent. Mine.",
+    "She treats the pack and finds the sickness is wolfsbane poisoning. Ends: Kade's mother is the one serving the tea.",
+    "Kade's fiancee Selene humiliates Mara at dinner; Mara exposes her in front of everyone. Ends: someone slips into Leo's room at night.",
+    "Kade shifts to save the boy, turns protective and jealous of the King's envoy. Ends: in the archive Mara finds her old test vial with another woman's name on it.",
+    "Kade's regret begins. Ends: the old healer who ran the test is found dead.",
+    "The council demands Mara leave; Kade apologises in public. Ends: Mara's gift reacts to his mother's dagger. It carries her own mother's blood.",
+    "Mara learns she is the daughter of Silver Fen's murdered Luna. Ends: Kade's mother says, You should have stayed barren.",
+    "Selene and the mother take Leo. Ends: Mara shifts for the first time, in front of the whole pack, into a white Alpha she-wolf."]},
+  {top:true, title:"The Divorce Papers He Never Signed", genre:"Billionaire romance", ch:60, per:1000, pov:"Elena Ward, the wife who walked out", gender:"a woman",
    premise:"On their third anniversary, Elena Ward finds divorce papers on the breakfast table, the morning after her billionaire husband's first love comes back to New York. She signs, walks out pregnant and tells no one. Five years later she is the architect his company needs to win the biggest deal of his life, under a name he doesn't know.",
-   twist:"Dominic never sent the papers. His assistant forged them, paid by his mother, and he has spent five years searching for a wife he believes walked out on him."},
+   twist:"Dominic Hale never sent the papers. His assistant Marcus forged his signature, paid from the family fund by Dominic's mother Catherine, and it was his first love Vivian who paid Marcus first.",
+   hooks:["Anniversary morning, the papers, she signs and leaves. Ends: a positive pregnancy test in an airport bathroom.",
+    "Five years later she is the architect E. Laurent with a daughter, Lily. Ends: the client is Hale Group, and Dominic insisted on Laurent.",
+    "The pitch; Dominic freezes when he sees her face. Ends: Lily runs across the lobby shouting Mommy, with Dominic's eyes.",
+    "You left me. I never signed anything. Ends: she shows him her copy, with his signature on it.",
+    "Vivian calls her a gold digger in public; Elena puts her in her place with her record. Ends: Vivian's car is following Lily's nanny.",
+    "Dominic protects Lily, gets jealous of Elena's partner Julien. Ends: the DNA test. Lily is his.",
+    "His regret, his pleading, her walls. Ends: a handwriting expert proves the signature was forged, by Marcus, with Dominic's own pen.",
+    "Marcus has vanished. Ends: a five-year-old bank transfer authorised by Catherine.",
+    "Catherine offers Elena money to disappear; Elena records it. Ends: You think it was me? Ask Vivian who paid Marcus first.",
+    "Elena exposes the forgery and Vivian at the gala. Ends: You never signed. So technically, I'm still your wife."]},
+  {top:true, title:"365 Days as the Lagos Billionaire's Wife", genre:"Billionaire romance", ch:60, per:1000, pov:"Adaeze Okafor, the waitress from Ajegunle", gender:"a woman",
+   premise:"Adaeze Okafor waits tables at a Lekki restaurant to pay for her mother's dialysis, until billionaire Tobi Adeyemi offers her a one-year marriage contract and enough money to save her mum, on one condition: his grandmother must believe it's real.",
+   twist:"His grandmother chose Adaeze herself. Adaeze was switched at birth with Kemi Balogun, the spoiled heiress Tobi was meant to marry, and the contract was the old woman's way of bringing the real heiress home.",
+   hooks:["Kemi humiliates her at the restaurant and she is fired in front of Tobi. Ends: he is waiting outside with a contract.",
+    "She negotiates the clauses and signs. Ends: the wedding is tomorrow, at his grandmother's house, in front of 500 guests.",
+    "Kemi crashes the wedding; Grandma silences her. Ends: Grandma whispers to Adaeze, Welcome home.",
+    "The Banana Island house, the rules, the tension. Ends: Kemi's father offers her fifty million naira to leave.",
+    "At a society party Adaeze shines and puts everyone in their place. Ends: Kemi's mother sees her face and faints.",
+    "Tobi's jealousy; a kiss for show turns real. Ends: someone has cancelled her mother's dialysis payment.",
+    "She accuses Tobi, but it was Kemi. Ends: the hospital bracelet in Grandma's drawer, with her mother's name and another baby's.",
+    "She investigates at the old Lagos Island maternity hospital. Ends: Kemi's mother walks into the room.",
+    "Grandma confesses everything; Adaeze feels used. Ends: Tobi says, I tore up the contract a month ago.",
+    "The Baloguns announce Kemi and Tobi's engagement; Adaeze arrives with the DNA. Ends: Mrs Balogun, I think I'm your daughter."]},
   {title:"The Don's Collateral Bride", genre:"Mafia romance", ch:60, per:1000,
    premise:"To pay her father's gambling debt, ER nurse Gia Russo has thirty days to marry Luca Moretti, the Chicago don whose bullet wound she once stitched without asking questions.",
    twist:"Luca isn't the man her father owes. He married her to hide her from the real creditor, her own uncle, who built her father's debts to get his hands on the building in Gia's name."},
-  {title:"365 Days as the Lagos Billionaire's Wife", genre:"Billionaire romance", ch:60, per:1000,
-   premise:"Adaeze Okafor waits tables at a Lekki restaurant to pay for her mother's dialysis, until billionaire Tobi Adeyemi offers her a one-year marriage contract and enough money to save her mum, on one condition: his grandmother must believe it's real.",
-   twist:"His grandmother chose Adaeze herself. Adaeze was switched at birth with the spoiled heiress Tobi was meant to marry, and the contract was the old woman's way of bringing the real heiress home."},
   {title:"I Died on Our Fifth Anniversary. This Time, I Leave First", genre:"Billionaire romance", ch:15, per:1000,
    premise:"Claire died alone in a hospital bed while her CEO husband sat upstairs beside his first love. She wakes up a year earlier, on the morning of their fifth anniversary, and quietly starts preparing her divorce, her career and her exit.",
    twist:"The crash that killed her was no accident, and the first love he chose over her is the one who paid for it."},
@@ -1190,7 +1221,7 @@ function readSettings(){
     chapters: Math.round(Number($("chapters").value)),
     words: Math.round(Number($("words").value)),
     delivery: document.querySelector('input[name="delivery"]:checked').value,
-    style:$("style").value, twistIdea: chosenTwist, genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
+    style:$("style").value, twistIdea: chosenTwist, hooks: chosenHooks, fixedTitle: chosenTitle, genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
     pov:$("pov").value.trim(), gender:$("gender").value, lang:$("lang").value, tier:$("tier").value
   };
 }
@@ -1229,20 +1260,20 @@ document.querySelectorAll('input[name="format"]').forEach(r=>r.addEventListener(
 $("presets").addEventListener("click", e=>{ const b = e.target.closest("button[data-w]"); if(!b) return; $("words").value = b.dataset.w; $("perch").value = Math.round(Number(b.dataset.w)/Math.max(1,num("chapters"))); updateCalc(); });
 
 /* ---------- premises ---------- */
-let chosenTwist = "";
-$("premise").addEventListener("input", ()=>{ chosenTwist = ""; });
+let chosenTwist = "", chosenHooks = null, chosenTitle = "";
+$("premise").addEventListener("input", ()=>{ chosenTwist = ""; chosenHooks = null; chosenTitle = ""; });
 $("hitsBtn").addEventListener("click", ()=>{
   $("ideas").hidden = false;
-  $("ideas").innerHTML = GN_IDEAS.map((g,i)=>`<button type="button" data-hit="${i}"><b>${escHtml(g.title)}</b>${escHtml(g.premise)}<small>${escHtml(g.genre)} · ${g.ch} chapters · twist ready</small></button>`).join("");
+  $("ideas").innerHTML = `<p class="note">The first three are the contract picks: title, narrator, twist and the hook of chapters 1 to 10 are built in.</p>` + GN_IDEAS.map((g,i)=>`<button type="button" data-hit="${i}"${g.top?' class="top"':''}><b>${g.top?'★ Contract pick · ':''}${escHtml(g.title)}</b>${escHtml(g.premise)}<small>${escHtml(g.genre)} · ${g.ch} chapters · ${g.hooks?'chapters 1–10 planned · ':''}twist ready</small></button>`).join("");
 });
 $("seed").addEventListener("click", ()=>{
   const cur = $("premise").value; let s;
   if($("style").value === "goodnovel"){
     let g; do { g = GN_IDEAS[Math.floor(Math.random()*GN_IDEAS.length)]; } while(g.premise===cur);
-    $("premise").value = g.premise; $("genre").value = g.genre; chosenTwist = g.twist; $("ideas").hidden = true; return;
+    $("premise").value = g.premise; $("genre").value = g.genre; chosenTwist = g.twist; chosenHooks = g.hooks || null; chosenTitle = g.top ? g.title : ""; $("ideas").hidden = true; return;
   }
   do { s = SEEDS[Math.floor(Math.random()*SEEDS.length)]; } while(s===cur);
-  $("premise").value = s; chosenTwist = ""; $("ideas").hidden = true;
+  $("premise").value = s; chosenTwist = ""; chosenHooks = null; chosenTitle = ""; $("ideas").hidden = true;
 });
 $("ideasBtn").addEventListener("click", async ()=>{
   if(busy || !sample) return;
@@ -1268,10 +1299,11 @@ $("ideas").addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   if(b.dataset.hit != null){
     const g = GN_IDEAS[Number(b.dataset.hit)];
-    $("style").value = "goodnovel"; $("genre").value = g.genre; $("premise").value = g.premise; chosenTwist = g.twist;
+    $("style").value = "goodnovel"; $("genre").value = g.genre; $("premise").value = g.premise; chosenTwist = g.twist; chosenHooks = g.hooks || null; chosenTitle = g.top ? g.title : "";
+    if(g.pov){ $("pov").value = g.pov; $("gender").value = g.gender || ""; }
     $("fmt-book").checked = true; $("chapters").value = g.ch; $("perch").value = g.per; $("words").value = g.ch * g.per; $("del-one").checked = true;
     updateCalc();
-  } else { $("premise").value = b.textContent; chosenTwist = ""; }
+  } else { $("premise").value = b.textContent; chosenTwist = ""; chosenHooks = null; chosenTitle = ""; }
   $("ideas").hidden = true;
 });
 
@@ -1287,7 +1319,11 @@ Twist type: ${s.twist}
 Narration: first person ("I"). The narrator is ${s.pov || "the main character (the writer's choice)"}${s.gender?`, ${s.gender}`:""}. Make the narrator the first entry in "characters".
 Language of every field and of the final text: ${s.lang}
 Premise from the writer: ${s.premise || "None. Invent one."}${s.twistIdea ? `
-Twist the writer wants (keep it secret from the reader until its chapter): ${s.twistIdea}` : ""}
+Twist the writer wants (keep it secret from the reader until its chapter): ${s.twistIdea}` : ""}${s.fixedTitle ? `
+Title: use exactly "${s.fixedTitle}".` : ""}${s.hooks ? `
+The writer's plan for the opening chapters. Follow it chapter by chapter, in this order: each line is what happens in that chapter and the cliffhanger it must end on. Keep these events and endings, and give each chapter its own title.
+${s.hooks.slice(0, s.chapters).map((h,i)=>`Chapter ${i+1}: ${h}`).join("\n")}${s.chapters > s.hooks.length ? `
+Plan the remaining chapters yourself, keeping the same pace and a hook at the end of each one.` : ""}` : ""}
 
 ${premiseRules(s)}
 If the writer gave a premise, keep it and only sharpen it into that plain, natural form.
