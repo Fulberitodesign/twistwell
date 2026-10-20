@@ -32,7 +32,7 @@
 body{background:var(--bg);color:var(--ink);font-family:var(--display);font-size:15px;line-height:1.45;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 .wrap{max-width:1220px;margin:0 auto;display:grid;grid-template-columns:360px minmax(0,1fr);gap:28px;align-items:start}
-@media (max-width:900px){.wrap{grid-template-columns:1fr}}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}}
 
 header.brand{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;border-bottom:1px solid var(--line);padding-bottom:14px}
 .brand h1{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:0}
@@ -49,14 +49,16 @@ form{display:flex;flex-direction:column;gap:16px}
 fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;min-width:0}
 fieldset+fieldset{border-top:1px solid var(--line);padding-top:16px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.row3{display:grid;grid-template-columns:.8fr 1fr 1.2fr;gap:10px}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.wrap>aside,.wrap>main{min-width:0}
+select{min-width:0;text-overflow:ellipsis}
+.row3{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1.2fr);gap:10px}
 select,textarea,input[type=number],input[type=search],input[type=text]{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%}
 input[type=number]{font-variant-numeric:tabular-nums}
 input#words{background:var(--brass-soft);border-color:var(--brass)}
 textarea{resize:vertical;min-height:84px;font-family:var(--prose);font-size:14px;line-height:1.5}
 select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-visible,summary:focus-visible,.seg input:focus-visible+span,label.upload:focus-within{outline:2px solid var(--accent);outline-offset:2px}
-.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border:1px solid var(--line);border-radius:6px;overflow:hidden}
 .seg label{position:relative}
 .seg input{position:absolute;opacity:0;inset:0;margin:0}
 .seg span{display:block;text-align:center;padding:8px 6px;font-size:14px;cursor:pointer;background:var(--panel)}
@@ -71,7 +73,7 @@ select:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-vis
 .calc{font-size:13px;color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
 .calc.warn{color:var(--flag-ink)}
 .premise-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
-.premise-head .links{display:flex;gap:12px}
+.premise-head .links{display:flex;gap:12px;flex-wrap:wrap}
 .link{background:none;border:0;padding:0;font:inherit;font-size:13px;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .link:disabled{opacity:.5;cursor:not-allowed}
 .ideas{display:flex;flex-direction:column;gap:6px}
@@ -290,11 +292,11 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
         <div class="row2">
           <div class="field">
             <label class="label" for="ending">Ending</label>
-            <select id="ending"><option value="cliffhanger" selected>Cliffhanger (leaves them wanting more)</option><option value="closed">Closed (everything resolved)</option></select>
+            <select id="ending"><option value="cliffhanger" selected>Cliffhanger</option><option value="closed">Closed</option></select>
           </div>
           <div class="field">
             <label class="label" for="pace">Pace</label>
-            <select id="pace"><option value="fast">Fast (a turn in every scene)</option><option value="balanced" selected>Balanced</option><option value="slow">Slow burn (more room to breathe)</option></select>
+            <select id="pace"><option value="fast">Fast</option><option value="balanced" selected>Balanced</option><option value="slow">Slow burn</option></select>
           </div>
         </div>
 
