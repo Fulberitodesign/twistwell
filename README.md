@@ -2,6 +2,14 @@
 
 Twistwell writes stories and novels told in the first person ("I"), built around a strong hook, clear character dynamics, chapter cliffhangers and a fair twist. Every chapter has a number and a title, and the result is laid out like a real book with a cover. You can export it to Word or paste it into Google Docs with the layout intact.
 
+## Languages
+
+English, Français, Español, Deutsch, Italiano, Português, Nederlands, Polski, Русский, Türkçe, Kiswahili, Bahasa Indonesia, हिन्दी, 中文 (简体), 中文 (繁體), 日本語, 한국어. The writer works natively in each language (dialogue punctuation, gender agreement, chapter headings, "The End" / "To be continued"); Chinese and Japanese lengths are counted in characters.
+
+## Story craft
+
+Every plan and chapter follows eight rules: a strong opening, clear storytelling, real characters, conflict and tension, emotions and reactions, progression, pacing, and a strong ending. You choose the pace (fast, balanced, slow burn) and the ending (cliffhanger by default, or closed). "Check the story" scores a finished story on those eight points, with one concrete fix for each.
+
 ## How it works
 
 - `public/` holds the website: `index.html` is the app and `shim.js` connects it to the server.

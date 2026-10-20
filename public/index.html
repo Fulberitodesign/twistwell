@@ -199,6 +199,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
 .pubrow .label .wc.bad{color:var(--flag-ink)}
 .pubrow .hint{grid-column:1/-1;font-size:12.5px;color:var(--muted);margin:-2px 0 2px}
 .pubhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.revscore{font-family:var(--mono);font-weight:500}.revscore.low{color:#B4442A}
 .theend{text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin:56px 0 8px}
 </style>
 
@@ -286,6 +287,17 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
           <div class="ideas" id="ideas" hidden></div>
         </div>
 
+        <div class="row2">
+          <div class="field">
+            <label class="label" for="ending">Ending</label>
+            <select id="ending"><option value="cliffhanger" selected>Cliffhanger (leaves them wanting more)</option><option value="closed">Closed (everything resolved)</option></select>
+          </div>
+          <div class="field">
+            <label class="label" for="pace">Pace</label>
+            <select id="pace"><option value="fast">Fast (a turn in every scene)</option><option value="balanced" selected>Balanced</option><option value="slow">Slow burn (more room to breathe)</option></select>
+          </div>
+        </div>
+
         <p class="note">Every story is told by “I”, from the inside, as if you lived it.</p>
         <div class="row2">
           <div class="field">
@@ -300,7 +312,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
         <div class="row2">
           <div class="field">
             <label class="label" for="lang">Language</label>
-            <select id="lang"><option>English</option><option>Français</option></select>
+            <select id="lang"><option>English</option><option>Français</option><option>Español</option><option>Deutsch</option><option>Italiano</option><option>Português</option><option>Nederlands</option><option>Polski</option><option>Русский</option><option>Türkçe</option><option>Kiswahili</option><option>Bahasa Indonesia</option><option>हिन्दी</option><option>中文 (简体)</option><option>中文 (繁體)</option><option>日本語</option><option>한국어</option></select>
           </div>
           <div class="field">
             <label class="label" for="tier">Quality</label>
@@ -325,7 +337,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
             <label class="label" for="srcText">The story</label>
             <label class="upload" id="srcFileLbl">Import a file<input type="file" id="srcFile" accept=".txt,.md,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document"></label>
           </div>
-          <textarea id="srcText" class="big" placeholder="Paste the story here. Headings like “Chapter 1” or “Chapitre 2” are kept as chapters."></textarea>
+          <textarea id="srcText" class="big" placeholder="Paste the story here. Headings like “Chapter 1”, “Chapitre 2”, “Capítulo 3”, “Kapitel 4” or “第5章” are kept as chapters."></textarea>
           <p class="calc" id="srcCount">Text (.txt), Markdown (.md) and Word (.docx) files work.</p>
         </div>
         <div class="row2">
@@ -345,7 +357,7 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
           </div>
           <div class="field">
             <label class="label" for="impLang">Language</label>
-            <select id="impLang"><option value="">Same as the text</option><option>English</option><option>Français</option></select>
+            <select id="impLang"><option value="">Same as the text</option><option>English</option><option>Français</option><option>Español</option><option>Deutsch</option><option>Italiano</option><option>Português</option><option>Nederlands</option><option>Polski</option><option>Русский</option><option>Türkçe</option><option>Kiswahili</option><option>Bahasa Indonesia</option><option>हिन्दी</option><option>中文 (简体)</option><option>中文 (繁體)</option><option>日本語</option><option>한국어</option></select>
           </div>
         </div>
         <label class="check"><input type="checkbox" id="impDeep" checked><span>Deepen my inner voice: add my thoughts, memories and feelings, without changing what happens</span></label>
@@ -430,6 +442,14 @@ label.upload input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%
       <nav class="contents" id="contents" hidden><h3 id="contentsLabel">Contents</h3><ol id="toc"></ol></nav>
       <article class="prose" id="prose"></article>
       <p class="theend" id="theend" hidden>The End</p>
+      <details class="panel" id="review" open hidden>
+        <summary>Story check: what keeps readers reading</summary>
+        <div class="panel-body">
+          <div class="pubhead"><p class="note">Scores the story on the eight things readers notice: the opening, the storytelling, the characters, the conflict, the emotions, the progression, the pacing and the ending. Each one gets a score out of 10 and one concrete fix.</p>
+            <button type="button" class="btn small" id="revGen">Check the story</button></div>
+          <div class="pubgrid" id="revGrid"></div>
+        </div>
+      </details>
       <details class="panel" id="gnpub" open hidden>
         <summary>GoodNovel: genre and tags</summary>
         <div class="panel-body">
@@ -477,7 +497,7 @@ const STYLE_RULES = `How to write it:
 - Trust the reader. Never explain an emotion after showing it. Never end a scene with a line summing up what it meant, a lesson, or a note of hope.
 - Don't open on weather, waking up, or a mirror. No dream sequences. Characters don't constantly nod, sigh, or exchange looks.
 - Similes are rare and come from the character's own world.
-- Use em dashes rarely (no more than one per 500 words). Avoid these patterns entirely: "It wasn't X. It was Y."; "not X, but Y" as a flourish; lists of three adjectives; rhetorical questions in narration; one-word paragraphs for drama.
+- Use em dashes rarely (no more than one per 500 words; the dashes that open dialogue in languages that use them don't count). Avoid these patterns entirely: "It wasn't X. It was Y."; "not X, but Y" as a flourish; lists of three adjectives; rhetorical questions in narration; one-word paragraphs for drama.
 - Use only the character names from the plan, spelled exactly the same way every time. Never use these names: ${BANNED_NAMES.join(", ")}.
 - Never use these words or phrases: ${BANNED_WORDS.join(", ")}, "little did they know", "a shiver down her spine", "a breath she didn't know she was holding", "somewhere, a dog barked".
 - Mark a scene change inside a chapter with a line containing only * * *
@@ -486,8 +506,7 @@ const STYLE_RULES = `How to write it:
 function voiceRules(s){
   const fr = (s.lang||"") === "Français";
   const who = s.pov ? `The narrator, "I", is ${s.pov}.` : `The narrator, "I", is the main character.`;
-  const g = s.gender==="a woman" ? (fr ? " The narrator is a woman: in French, past participles and adjectives about her agree in the feminine (je suis allée, je me suis sentie)." : " The narrator is a woman.")
-          : s.gender==="a man" ? (fr ? " The narrator is a man: masculine agreement in French (je suis allé, je me suis senti)." : " The narrator is a man.") : "";
+  const g = genderNote(s, "The narrator is");
   return `Voice: the whole story is told in the first person ("I"${fr?', in French "je"':''}), by someone who lived it and is telling it from the inside. ${who}${g}
 - Never use second-person narration and never address the reader as "you".
 - It must feel like it comes from deep inside the narrator: what I think, remember and feel in my body as things happen (a tight throat, cold hands, a smell that brings back a whole year of my life). Short, honest interior thoughts, including the petty, ashamed or contradictory ones people really have.
@@ -496,6 +515,27 @@ function voiceRules(s){
 - Admissions and private details a person would only write down for themselves.
 - Still show more than tell: no speeches about feelings, no lessons${isGN(s) ? "; big emotions are fine when they come through action, dialogue and the body" : ", no melodrama"}.`;
 }
+
+const CRAFT_RULES = `What makes a reader stay (check every chapter against these):
+1. Strong opening: the first lines drop the reader into a specific moment of trouble, oddness or desire, with one concrete detail that raises a question. No background, no weather, no waking up.
+2. Clear, engaging storytelling: at every moment the reader knows where we are, who is present, what the narrator wants and what is at stake. Scenes are shown in real time with action and dialogue; summary only bridges time.
+3. Characters who feel real: each important character has a want, a fear, a secret, a way of talking and a small habit or contradiction. They act on their own goals, make choices with consequences and are never only there to serve the plot.
+4. Conflict and tension: every scene has someone who wants something and someone or something in the way. Raise the stakes as the story goes; keep a question open at all times (what will happen, who is lying, will she find out).
+5. Emotions and reactions: after every important event, show how the narrator reacts, in the body, in a thought, in a choice, and how the others react. Readers connect through these reactions; never name an emotion when you can show it.
+6. Progression: every chapter changes something for good (a relationship, a piece of knowledge, a plan, the stakes). The story never circles back to the same situation; each chapter ends in a different place than it began.
+7. Pacing: no scene that changes nothing, no repeated conversation, no character explaining what the reader already knows. Enter scenes late, leave them early. Alternate fast scenes (action, confrontation) with short moments to breathe.
+8. Strong ending: the climax pays off the conflict the opening set up, and the last line is the one readers remember.`;
+const PACE_RULES = {
+  fast: "Pace: fast. Short scenes, a turn or reveal in every scene, lots of dialogue and confrontation, very little description. Something new happens on every page.",
+  balanced: "Pace: balanced. Alternate tense, fast scenes with shorter quiet moments where the narrator reacts and decides. Never let more than a page go by without a new question or a shift.",
+  slow: "Pace: slow burn. Give scenes room for atmosphere, memory and the narrator's inner life, but every scene still moves the conflict forward and adds tension; tension grows slowly instead of in jumps."
+};
+const paceRules = s => PACE_RULES[s?.pace] || PACE_RULES.balanced;
+const ENDING_RULES = {
+  cliffhanger: "Ending: a cliffhanger. The last chapter resolves the main conflict and lands the twist, so the story feels complete, then in its final lines something new and concrete opens a bigger question (a message, a person at the door, an object, a line of dialogue that changes everything) and the story cuts off right there, unresolved.",
+  closed: "Ending: closed. The last chapter resolves the main conflict and lands the twist, and the final image shows how the narrator has changed. No loose threads, no sequel hook."
+};
+const endingRules = s => s?.ending ? ENDING_RULES[s.ending] || "" : "";
 
 const TWIST_RULES = `The twist must play fair:
 - It recontextualizes scenes the reader has already read. It is never a brand-new fact dropped at the end.
@@ -611,6 +651,53 @@ const SEEDS = [
 /* ---------- helpers ---------- */
 const escHtml = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const fr = p => (p.settings?.lang || "English") === "Français";
+
+/* ---------- languages ----------
+   en: name given to the writer model; code: html/docx language; chapter: heading for chapter n;
+   quotes: how dialogue is punctuated; gender: past forms or adjectives agree with the narrator's gender;
+   cjk: written without spaces (length is counted in characters); dash: dialogue uses dashes. */
+const LANGS = [
+  {name:"English", en:"English", code:"en-GB", chapter:n=>"Chapter "+numWord(n,false), contents:"Contents", end:"The End", cont:"To be continued", quotes:"double curly quotes “ ”"},
+  {name:"Français", en:"French", code:"fr-FR", chapter:n=>"Chapitre "+numWord(n,true), contents:"Table des matières", end:"Fin", cont:"À suivre", quotes:"guillemets « » with a non-breaking space inside, and a dash for each new speaker", gender:"je suis allée, je me suis sentie seule"},
+  {name:"Español", en:"Spanish", code:"es-ES", chapter:n=>"Capítulo "+n, contents:"Índice", end:"Fin", cont:"Continuará", quotes:"the raya (—) at the start of each line of dialogue, as Spanish novels do", gender:"estaba cansada, me sentí sola", dash:true},
+  {name:"Deutsch", en:"German", code:"de-DE", chapter:n=>"Kapitel "+n, contents:"Inhalt", end:"Ende", cont:"Fortsetzung folgt", quotes:"German quotation marks „ “"},
+  {name:"Italiano", en:"Italian", code:"it-IT", chapter:n=>"Capitolo "+n, contents:"Indice", end:"Fine", cont:"Continua", quotes:"caporali « »", gender:"sono andata, mi sono sentita sola"},
+  {name:"Português", en:"Portuguese", code:"pt-PT", chapter:n=>"Capítulo "+n, contents:"Índice", end:"Fim", cont:"Continua", quotes:"the travessão (—) at the start of each line of dialogue", gender:"fiquei cansada, obrigada", dash:true},
+  {name:"Nederlands", en:"Dutch", code:"nl-NL", chapter:n=>"Hoofdstuk "+n, contents:"Inhoud", end:"Einde", cont:"Wordt vervolgd", quotes:"single quotes ‘ ’ as Dutch novels do"},
+  {name:"Polski", en:"Polish", code:"pl-PL", chapter:n=>"Rozdział "+n, contents:"Spis treści", end:"Koniec", cont:"Ciąg dalszy nastąpi", quotes:"a dash (—) at the start of each line of dialogue", gender:"poszłam, byłam zmęczona", dash:true},
+  {name:"Русский", en:"Russian", code:"ru-RU", chapter:n=>"Глава "+n, contents:"Содержание", end:"Конец", cont:"Продолжение следует", quotes:"a dash (—) at the start of each line of dialogue, and «ёлочки» for quotes", gender:"я пошла, я устала", dash:true},
+  {name:"Türkçe", en:"Turkish", code:"tr-TR", chapter:n=>"Bölüm "+n, contents:"İçindekiler", end:"Son", cont:"Devam edecek", quotes:"double quotes “ ” or a dash at the start of dialogue"},
+  {name:"Kiswahili", en:"Swahili", code:"sw-KE", chapter:n=>"Sura ya "+n, contents:"Yaliyomo", end:"Mwisho", cont:"Itaendelea", quotes:"double quotes “ ”"},
+  {name:"Bahasa Indonesia", en:"Indonesian", code:"id-ID", chapter:n=>"Bab "+n, contents:"Daftar Isi", end:"Tamat", cont:"Bersambung", quotes:"double quotes “ ”"},
+  {name:"हिन्दी", en:"Hindi", code:"hi-IN", chapter:n=>"अध्याय "+n, contents:"विषय-सूची", end:"समाप्त", cont:"जारी है", quotes:"double quotes “ ”", gender:"मैं गई, मैं थक गई थी"},
+  {name:"中文 (简体)", en:"Simplified Chinese", code:"zh-CN", chapter:n=>`第${n}章`, contents:"目录", end:"全文完", cont:"未完待续", quotes:"Chinese quotation marks “ ” and full-width punctuation (，。？！)", cjk:"Chinese characters"},
+  {name:"中文 (繁體)", en:"Traditional Chinese", code:"zh-TW", chapter:n=>`第${n}章`, contents:"目錄", end:"全文完", cont:"未完待續", quotes:"corner brackets 「 」 and full-width punctuation (，。？！)", cjk:"Chinese characters"},
+  {name:"日本語", en:"Japanese", code:"ja-JP", chapter:n=>`第${n}章`, contents:"目次", end:"完", cont:"つづく", quotes:"corner brackets 「 」 and Japanese punctuation (、。)", cjk:"Japanese characters"},
+  {name:"한국어", en:"Korean", code:"ko-KR", chapter:n=>`제${n}장`, contents:"목차", end:"끝", cont:"다음 편에 계속", quotes:"double quotes “ ”"}
+];
+function langOf(s){
+  const v = String(s?.lang || "English").trim();
+  return LANGS.find(l => l.name===v || l.en.toLowerCase()===v.toLowerCase())
+    || {...LANGS[0], name:v, en:v, chapter:n=>"Chapter "+n, quotes:"the usual dialogue punctuation of that language"};
+}
+const L = p => langOf(p.settings);
+const langName = s => langOf(s).en;
+const endLabel = p => p.settings?.ending==="cliffhanger" ? L(p).cont : L(p).end;
+function langRules(s){
+  const l = langOf(s);
+  if(l.en==="English") return "";
+  return `Language: write directly in ${l.en}, as a native ${l.en}-speaking novelist would, never as a translation from English. Use natural, current ${l.en} idioms, sentence rhythm and dialogue; the dialogue sounds like real people who speak ${l.en}. For dialogue use ${l.quotes}. The banned words and phrases listed below also apply to their usual ${l.en} equivalents (stock phrases, clichés, purple prose).${l.cjk ? ` Count length in ${l.cjk}: about ${CJK_PER_WORD} characters for every English word asked.` : ""}`;
+}
+function genderNote(s, me){
+  const l = langOf(s), woman = s.gender==="a woman", man = s.gender==="a man";
+  if(!woman && !man) return "";
+  if(fr({settings:s})) return woman
+    ? ` ${me} a woman: in French, past participles and adjectives about her agree in the feminine (je suis allée, je me suis sentie seule).`
+    : ` ${me} a man: masculine agreement in French (je suis allé, je me suis senti seul).`;
+  if(l.gender) return ` ${me} ${woman?"a woman":"a man"}: in ${l.en}, every word that agrees with the narrator (verb forms, participles, adjectives) is ${woman?"feminine":"masculine"}${woman?` (${l.gender})`:""}.`;
+  return ` ${me} ${woman?"a woman":"a man"}.`;
+}
+const lenText = (s, n) => langOf(s).cjk ? `${fmtN(Math.round(n*CJK_PER_WORD))} ${langOf(s).cjk} (about ${fmtN(n)} English words)` : `${fmtN(n)} words`;
 const fmtN = n => Number(n).toLocaleString("en-US");
 function numWord(n, french){
   if(french){
@@ -621,7 +708,7 @@ function numWord(n, french){
   const u=["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"], t=["","","Twenty","Thirty","Forty","Fifty","Sixty"];
   return n<20 ? u[n] : t[Math.floor(n/10)] + (n%10 ? "-"+u[n%10] : "");
 }
-const chapterLabel = (p,i) => (fr(p) ? "Chapitre " : "Chapter ") + numWord(i+1, fr(p));
+const chapterLabel = (p,i) => L(p).chapter(i+1);
 const AUTHOR = "FAVFIDEL";
 const BYLINE = `A Novel By ${AUTHOR}`;
 const kindLabel = p => BYLINE;
@@ -630,7 +717,13 @@ function cleanModelText(t){
     .replace(/^\s*(?:\*\s*\*\s*\*|\*{3,}|#{3,}|-{3,}|⁂)\s*$/gm,"* * *").trim();
 }
 const paraList = text => cleanModelText(text).split(/\n+/).map(s=>s.trim()).filter(Boolean);
-function words(text){ return (String(text).trim().match(/\S+/g)||[]).length; }
+const CJK_PER_WORD = 1.6;   // characters of Chinese or Japanese per English word
+const CJK_RE = /[\u3040-\u30ff\u3400-\u9fff\uf900-\ufaff]/g, CJK_PUNCT = /[\u3000-\u303f\uff00-\uffef]/g;
+function words(text){
+  const t = String(text), cjk = (t.match(CJK_RE)||[]).length;
+  const rest = (t.replace(CJK_RE," ").replace(CJK_PUNCT," ").trim().match(/\S+/g)||[]).length;
+  return rest + Math.round(cjk / CJK_PER_WORD);
+}
 const partWords = x => x?.text ? words(x.text) : (x?.words||0);
 const totalWords = p => p.parts.reduce((a,x)=>a+partWords(x),0);
 function countFlags(text){ const m = cleanModelText(text).match(FLAG_RE); return m ? m.length : 0; }
@@ -812,7 +905,7 @@ Pick ONE central image from inside the story (an object, a building, a vehicle, 
 Choose colors that fit the genre and the mood of the setting, like a real bookshop cover (not neon, not purple gradients). "ink" must contrast strongly with "bg" and "bg2"; "accent" is a second color that stands out against them.
 
 Reply with only JSON:
-{"image":"what the image is, in a few words","layout":"one of frame, centered-motif, bottom-band, full-bleed-motif, split","font":"one of Playfair Display, Oswald, Cormorant Garamond, Archivo Black, Libre Baskerville (pick what suits the genre)","uppercase":true or false,"palette":{"bg":"#hex","bg2":"#hex","ink":"#hex","accent":"#hex"},"texture":"grain, lines or none","tagline":"a teaser line in ${s.lang} under 10 words, no spoilers","paths":[{"d":"M ... Z","fill":"ink","opacity":1,"rule":"nonzero"}]}`;
+{"image":"what the image is, in a few words","layout":"one of frame, centered-motif, bottom-band, full-bleed-motif, split","font":"one of Playfair Display, Oswald, Cormorant Garamond, Archivo Black, Libre Baskerville (pick what suits the genre)","uppercase":true or false,"palette":{"bg":"#hex","bg2":"#hex","ink":"#hex","accent":"#hex"},"texture":"grain, lines or none","tagline":"a teaser line in ${langName(s)} under 10 words, no spoilers","paths":[{"d":"M ... Z","fill":"ink","opacity":1,"rule":"nonzero"}]}`;
 }
 function imagePromptRequest(p){
   const plan = p.plan, s = p.settings;
@@ -916,7 +1009,7 @@ let db = null, uid = null;
 let history = [];   // project objects; chapter text may be unloaded (loaded:false)
 const writeChains = new Map();
 function queued(path, fn){ const prev = writeChains.get(path) || Promise.resolve(); const next = prev.catch(()=>{}).then(fn); writeChains.set(path, next); return next; }
-const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, publish:p.publish||null, gn:p.gn||null, hasImg:!!p.coverImg,
+const metaOf = p => ({ kind:"project", id:p.id, import:!!p.import, settings:p.settings, plan:p.plan, cover:p.cover||null, imgPrompt:p.imgPrompt||null, publish:p.publish||null, gn:p.gn||null, review:p.review||null, hasImg:!!p.coverImg,
   parts:p.parts.map(x=>x?({done:!!x.done,segDone:x.segDone||0,recap:x.recap||"",words:partWords(x)}):null), created:p.created, updated:p.updated });
 function lsSave(){
   try{
@@ -971,7 +1064,7 @@ async function storeDelete(p){
   try{ await Promise.all(jobs); }catch{}
 }
 function fromMeta(m){
-  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, publish:m.publish||null, gn:m.gn||null, hasImg:!!m.hasImg, coverImg:null,
+  return { id:m.id, import:!!m.import, settings:m.settings, plan:m.plan, cover:m.cover?sanitizeCover(m.cover):null, imgPrompt:m.imgPrompt||null, publish:m.publish||null, gn:m.gn||null, review:m.review||null, hasImg:!!m.hasImg, coverImg:null,
     parts:(m.parts||[]).map(x=>x?({...x, text:undefined}):null), created:m.created||0, updated:m.updated||0, loaded:false };
 }
 function readLocal(){
@@ -1027,13 +1120,16 @@ function renderPlan(p){
   }
   if(plan.premise) L.push(`<div><h4>Premise</h4><p>${escHtml(plan.premise)}</p></div>`);
   if(plan.hook) L.push(`<div><h4>The hook</h4><p>${escHtml(plan.hook)}</p></div>`);
+  if(plan.stakes) L.push(`<div><h4>Stakes</h4><p>${escHtml(plan.stakes)}</p></div>`);
+  if(plan.arc) L.push(`<div><h4>The narrator's arc</h4><p>${escHtml(plan.arc)}</p></div>`);
   if(plan.characters?.length) L.push(`<div><h4>Characters</h4><ul>${plan.characters.map(c=>`<li><b>${escHtml(c.name)}</b>, ${escHtml(c.role)}. Wants: ${escHtml(c.want)}.${c.fear?` Fears: ${escHtml(c.fear)}.`:""}${c.secret?` Hides: ${escHtml(c.secret)}.`:""}${c.speech?` Talks: ${escHtml(c.speech)}.`:""}</li>`).join("")}</ul></div>`);
   if(plan.dynamics?.length) L.push(`<div><h4>Character dynamics</h4><ul>${plan.dynamics.map(d=>`<li><b>${escHtml(d.between)}:</b> ${escHtml(d.tension)}${d.shift?` <i>Over the story: ${escHtml(d.shift)}</i>`:""}</li>`).join("")}</ul></div>`);
   if(plan.twist){ L.push(`<div><h4>The twist${plan.twist_chapter && isMulti(p)?` · revealed in chapter ${escHtml(plan.twist_chapter)}`:""}</h4><p>${escHtml(plan.twist.reveal)}</p></div>`);
     if(plan.twist.why_it_works) L.push(`<div><h4>Why it lands</h4><p>${escHtml(plan.twist.why_it_works)}</p></div>`); }
   if(plan.clues?.length) L.push(`<div><h4>Clues planted</h4><ul>${plan.clues.map(c=>`<li><b>${escHtml(c.where)}:</b> ${escHtml(c.what)}${c.how_misread?` <i>(misread as: ${escHtml(c.how_misread)})</i>`:""}</li>`).join("")}</ul></div>`);
+  if(plan.ending) L.push(`<div><h4>The ending${p.settings.ending==="cliffhanger"?" (cliffhanger)":""}</h4><p>${escHtml(plan.ending)}</p></div>`);
   if(plan.setting || plan.voice) L.push(`<div><h4>Setting and voice</h4><p>${escHtml(plan.setting||"")}${plan.voice?` ${escHtml(plan.voice)}`:""}</p></div>`);
-  if(plan.chapters?.length) L.push(`<div><h4>Detailed outline</h4><div class="outline">${plan.chapters.map((c,i)=>`<div class="oc"><span class="on">${i+1}. ${escHtml(c.title)}</span><span>${escHtml(c.summary)}</span><dl>${c.goal?`<dt>Goal</dt><dd>${escHtml(c.goal)}</dd>`:""}${c.obstacle?`<dt>Against</dt><dd>${escHtml(c.obstacle)}</dd>`:""}${c.turn?`<dt>Turn</dt><dd>${escHtml(c.turn)}</dd>`:""}${c.beats?.length?`<dt>Scenes</dt><dd>${c.beats.map(escHtml).join(" · ")}</dd>`:""}${c.cliffhanger?`<dt>Ends on</dt><dd class="cliff">${escHtml(c.cliffhanger)}</dd>`:""}</dl></div>`).join("")}</div></div>`);
+  if(plan.chapters?.length) L.push(`<div><h4>Detailed outline</h4><div class="outline">${plan.chapters.map((c,i)=>`<div class="oc"><span class="on">${i+1}. ${escHtml(c.title)}</span><span>${escHtml(c.summary)}</span><dl>${c.goal?`<dt>Goal</dt><dd>${escHtml(c.goal)}</dd>`:""}${c.obstacle?`<dt>Against</dt><dd>${escHtml(c.obstacle)}</dd>`:""}${c.turn?`<dt>Turn</dt><dd>${escHtml(c.turn)}</dd>`:""}${c.emotion?`<dt>Feeling</dt><dd>${escHtml(c.emotion)}</dd>`:""}${c.beats?.length?`<dt>Scenes</dt><dd>${c.beats.map(escHtml).join(" · ")}</dd>`:""}${c.cliffhanger?`<dt>Ends on</dt><dd class="cliff">${escHtml(c.cliffhanger)}</dd>`:""}</dl></div>`).join("")}</div></div>`);
   $("planBody").innerHTML = L.join("");
 }
 $("planBody").addEventListener("click", e=>{
@@ -1089,7 +1185,7 @@ function render(p){
 
   const multi = !!plan.chapters && isMulti(p);
   $("contents").hidden = !multi;
-  $("contentsLabel").textContent = fr(p) ? "Table des matières" : "Contents";
+  $("contentsLabel").textContent = L(p).contents;
   if(multi){
     $("toc").innerHTML = plan.chapters.map((c,i)=>{
       const part = p.parts[i], st = part?.done ? `${fmtN(partWords(part))} w` : part?.text ? "in progress" : "not written";
@@ -1098,8 +1194,9 @@ function render(p){
   }
   $("prose").innerHTML = p.parts.map((x,i)=> x && (x.text || !p.import) ? `<section class="chapter" id="ch-${i}">${chapterSectionHtml(p,i,false)}</section>` : "").join("");
   $("theend").hidden = !isComplete(p);
-  $("theend").textContent = fr(p) ? "Fin" : "The End";
+  $("theend").textContent = endLabel(p);
   renderPublish(p);
+  renderReview(p);
   updateTools();
   renderHistory();
 }
@@ -1119,7 +1216,7 @@ function updateTools(){
   const p = current, has = p.parts.some(x=>x?.text);
   const all = p.parts.map(x=>x?.text||"").join("\n\n");
   const n = countFlags(all), d = dashCount(all), w = words(all);
-  const dashHeavy = w && d > Math.max(2, w/500);
+  const dashHeavy = w && !L(p).dash && d > Math.max(2, w/500);
   $("flags").innerHTML = !has ? "" : (n ? `<b>${n}</b> flagged phrase${n>1?"s":""}` : "No flagged phrases") + (dashHeavy ? ` · ${d} em dashes` : "");
   const canWork = !busy && !!sample && !p.example && !!p.plan;
   const ni = p.plan ? nextIndex(p) : null;
@@ -1230,7 +1327,7 @@ function readSettings(){
     words: Math.round(Number($("words").value)),
     delivery: document.querySelector('input[name="delivery"]:checked').value,
     style:$("style").value, twistIdea: chosenTwist, hooks: chosenHooks, fixedTitle: chosenTitle, genre:$("genre").value, twist:$("twist").value || "Writer's choice", premise:$("premise").value.trim(),
-    pov:$("pov").value.trim(), gender:$("gender").value, lang:$("lang").value, tier:$("tier").value
+    pov:$("pov").value.trim(), gender:$("gender").value, lang:$("lang").value, tier:$("tier").value, ending:$("ending").value, pace:$("pace").value
   };
 }
 function settingsValid(){
@@ -1289,7 +1386,7 @@ $("ideasBtn").addEventListener("click", async ()=>{
   $("ideas").hidden = false; $("ideas").innerHTML = `<p class="note">Thinking of premises…</p>`;
   $("ideasBtn").disabled = true;
   try{
-    const list = await sample.json(`Suggest 3 different premises for a ${s.genre.toLowerCase()} ${s.format==="book"?"novel":"story"} that will have a twist (type: ${s.twist}). Write them in ${s.lang}.
+    const list = await sample.json(`Suggest 3 different premises for a ${s.genre.toLowerCase()} ${s.format==="book"?"novel":"story"} that will have a twist (type: ${s.twist}). Write them in ${langName(s)}.
 
 ${premiseRules(s)}
 
@@ -1320,12 +1417,13 @@ function planPrompt(s){
   const per = Math.round(s.words/s.chapters), segs = Math.max(1, Math.ceil(per/SEG_WORDS));
   const beatsN = Math.min(12, Math.max(3, segs*3));
   const kind = s.format==="book" ? "a novel" : "a story";
-  return `You are planning ${kind} of about ${fmtN(s.words)} words in exactly ${s.chapters} chapter${s.chapters>1?"s":""} (about ${fmtN(per)} words each), built around a strong hook, clear character dynamics, heavy chapter cliffhangers and a twist.
+  return `You are planning ${kind} of about ${lenText(s, s.words)} in exactly ${s.chapters} chapter${s.chapters>1?"s":""} (about ${lenText(s, per)} each), built around a strong hook, real characters, constant conflict, clear progression, heavy chapter cliffhangers, a twist and a strong ending.
 
 Genre: ${s.genre}
 Twist type: ${s.twist}
 Narration: first person ("I"). The narrator is ${s.pov || "the main character (the writer's choice)"}${s.gender?`, ${s.gender}`:""}. Make the narrator the first entry in "characters".
-Language of every field and of the final text: ${s.lang}
+Language of every field and of the final text: ${langName(s)}
+${langRules(s)}
 Premise from the writer: ${s.premise || "None. Invent one."}${s.twistIdea ? `
 Twist the writer wants (keep it secret from the reader until its chapter): ${s.twistIdea}` : ""}${s.fixedTitle ? `
 Title: use exactly "${s.fixedTitle}".` : ""}${s.hooks ? `
@@ -1342,6 +1440,12 @@ Character dynamics: give the main characters wants that collide. For each import
 
 ${HOOK_RULES}
 
+${CRAFT_RULES}
+
+${paceRules(s)}
+
+${endingRules(s)}
+
 ${voiceRules(s)}
 
 ${TWIST_RULES}
@@ -1351,7 +1455,7 @@ ${titleRules(s)}
 
 ${marketRules(s)}
 
-Structure: a clear shape with rising stakes. Each chapter has a goal, an obstacle, a turn that changes the situation, and (except the last) a cliffhanger that the next chapter must pick up. Characters keep the same names, ages, jobs and facts throughout. Ground it in a real, specific place and time.
+Structure: a clear shape with rising stakes. The narrator changes over the story ("arc"). Each chapter has a goal, an obstacle, a turn that changes the situation, and (except the last) a cliffhanger that the next chapter must pick up. Characters keep the same names, ages, jobs and facts throughout. Ground it in a real, specific place and time.
 
 Reply with only JSON in this shape:
 {
@@ -1365,10 +1469,13 @@ Reply with only JSON in this shape:
  "voice": "the narrative voice in concrete terms: rhythm, vocabulary, attitude",
  "characters": [{"name":"First Last","role":"age and job","want":"","fear":"","secret":"","speech":"how they talk"}],
  "dynamics": [{"between":"Name and Name","tension":"what pulls them together and apart, and who has the upper hand","shift":"how it changes over the story"}],
+ "stakes": "what the narrator stands to lose, concretely, and how it gets worse",
+ "arc": "who the narrator is at the start, and who they are at the end",
+ "ending": "the final scene and the exact last moment the story ends on${s.ending==="cliffhanger" ? " (the cliffhanger)" : ""}",
  "twist": {"reveal":"what is actually true","why_it_works":"how it reframes earlier scenes"},
  "clues": [{"where":"chapter number and scene","what":"","how_misread":""}],
  "twist_chapter": number,
- "chapters": [{"title":"short chapter title","summary":"2 to 3 sentences of what happens","goal":"what the point-of-view character wants in this chapter","obstacle":"who or what is in the way","turn":"what changes","cliffhanger":"the exact moment the chapter cuts off on (empty for the last chapter)","beats":["${beatsN} concrete scene beats in order"]}]
+ "chapters": [{"title":"short chapter title","summary":"2 to 3 sentences of what happens","goal":"what the point-of-view character wants in this chapter","obstacle":"who or what is in the way","turn":"what changes for good","emotion":"what the narrator feels in this chapter and how it shows","cliffhanger":"the exact moment the chapter cuts off on (empty for the last chapter)","beats":["${beatsN} concrete scene beats in order"]}]
 }
 "chapters" must contain exactly ${s.chapters} item${s.chapters>1?"s":""}, every one with a title.`;
 }
@@ -1393,9 +1500,11 @@ function segPrompt(p, i, k, K){
   else opening = `Open by picking up the previous chapter's cliffhanger (${plan.chapters[i-1]?.cliffhanger||"see the text above"}): show its consequence directly or after a short, tense delay. Never skip it, and don't repeat the last lines.`;
   let ending;
   if(!last) ending = "Stop at a natural paragraph break after the last beat. Don't wrap anything up.";
-  else if(finalCh) ending = "This is the ending. Land it in a concrete image or action, without explaining the twist back to the reader.";
+  else if(finalCh) ending = s.ending==="cliffhanger"
+    ? `This is the ending. Pay off the conflict and land the twist in concrete action, without explaining it back to the reader. Then end on a cliffhanger${plan.ending?`: ${plan.ending}`:""}: one new, concrete development in the last lines opens a bigger question, and the story cuts off in the middle of that moment, unresolved. The very last line must leave the reader desperate for more.`
+    : `This is the ending. Land it in a concrete image or action${plan.ending?` (${plan.ending})`:""}, without explaining the twist back to the reader.`;
   else ending = `End the chapter on a heavy cliffhanger: ${ch.cliffhanger||"cut away at the worst or most revealing moment"}. Cut away in the middle of that moment, shown in action or dialogue, unresolved. The last line should make it impossible not to turn the page.`;
-  return `You are writing ${s.format==="book"?"a novel":"a story"} called "${plan.title}". Language: ${s.lang}.
+  return `You are writing ${s.format==="book"?"a novel":"a story"} called "${plan.title}". Language: ${langName(s)}.
 
 STORY BIBLE (for you only, never shown to the reader):
 ${JSON.stringify(bible)}
@@ -1405,14 +1514,20 @@ ${outline}
 ${recaps ? `\nWHAT HAS ACTUALLY HAPPENED SO FAR (stay consistent with every detail):\n${recaps}\n` : ""}${tail ? `\nTHE TEXT JUST BEFORE WHERE YOU CONTINUE:\n"""${tail}"""\n` : ""}
 NOW WRITE: chapter ${i+1} of ${N}, "${ch.title}".
 What happens: ${ch.summary}
-Goal: ${ch.goal||""} · In the way: ${ch.obstacle||""} · Turn: ${ch.turn||""}
-${K>1 ? `This chapter is written in ${K} parts and you are writing part ${k} of ${K}, about ${fmtN(target)} words.` : `Length: about ${fmtN(target)} words.`}
+Goal: ${ch.goal||""} · In the way: ${ch.obstacle||""} · Turn: ${ch.turn||""}${ch.emotion?` · Feeling: ${ch.emotion}`:""}
+${K>1 ? `This chapter is written in ${K} parts and you are writing part ${k} of ${K}, about ${lenText(s, target)}.` : `Length: about ${lenText(s, target)}.`}
 Cover these beats: ${myBeats.join(" | ")}
 ${opening}
 ${ending}${twistNote}
 Keep the character dynamics from the bible alive in every scene.
 
 ${HOOK_RULES}
+
+${CRAFT_RULES}
+
+${paceRules(s)}
+
+${langRules(s)}
 
 ${marketRules(s)}
 
@@ -1614,6 +1729,56 @@ async function makePublish(p){
 }
 $("pubGen").addEventListener("click", ()=>{ if(current.plan && !current.example) makePublish(current); });
 
+/* ---------- story check: the eight things readers notice ---------- */
+const REVIEW_KEYS = [
+  ["opening","Opening"], ["storytelling","Storytelling"], ["characters","Characters"], ["conflict","Conflict and tension"],
+  ["emotion","Emotions and reactions"], ["progression","Progression"], ["pacing","Pacing"], ["ending","Ending"]
+];
+function reviewPrompt(p){
+  const opening = cleanModelText(p.parts[0]?.text || "").slice(0, 2500);
+  return `You are a demanding fiction editor. Judge this ${p.settings.format==="book"?"novel":"story"} on the eight things that make readers keep reading, and be honest: a 10 is rare.
+
+${storyDigest(p)}
+
+The opening of the text:
+"""${opening}"""
+
+${CRAFT_RULES}
+${p.settings.ending==="cliffhanger" ? "The writer wanted the story to end on a cliffhanger." : ""}
+
+For each of the eight points (${REVIEW_KEYS.map(k=>k[0]).join(", ")}) give a score from 1 to 10, what works (one short sentence) and one concrete fix that names the chapter or the scene (one or two sentences). Write "good" and "fix" in French.
+Reply with only JSON:
+{"overall":"two sentences in French: the story's biggest strength and the one change that would help most","scores":[${REVIEW_KEYS.map(k=>`{"key":"${k[0]}","score":7,"good":"","fix":""}`).join(",")}]}`;
+}
+async function makeReview(p){
+  if(!sample || !p.plan || coverBusy.has("rev:"+p.id)) return;
+  coverBusy.add("rev:"+p.id); if(current===p) renderReview(p);
+  try{
+    const r = await sample.json(reviewPrompt(p), { modelTier: p.settings.tier || "default", cache:false });
+    const list = Array.isArray(r?.scores) ? r.scores : [];
+    const scores = REVIEW_KEYS.map(([k])=>{ const x = list.find(y=>y && y.key===k) || {}; const n = Math.round(Number(x.score));
+      return { key:k, score: n>=1 && n<=10 ? n : null, good:String(x.good||""), fix:String(x.fix||"") }; });
+    if(!scores.some(x=>x.score)) throw {code:"invalid_json"};
+    p.review = { overall:String(r.overall||""), scores, at:Date.now() };
+    storeSave(p);
+  } catch(e){ if(current===p && !busy) setStatus(e?.code==="invalid_json" ? "The story check came back garbled. Press the button again." : errCopy(e),"err"); if(isFatal(e)) sample = null; }
+  finally { coverBusy.delete("rev:"+p.id); if(current===p) renderReview(p); }
+}
+function renderReview(p){
+  const show = !!p.plan && !p.example && (isComplete(p) || !!p.review);
+  $("review").hidden = !show;
+  if(!show) return;
+  const working = coverBusy.has("rev:"+p.id), d = p.review;
+  $("revGen").textContent = working ? "Reading…" : d ? "Check again" : "Check the story";
+  $("revGen").disabled = working || busy || !sample;
+  if(!d){ $("revGrid").innerHTML = `<p class="note">${working ? "Reading the story…" : "Press Check the story to see how it does on each point."}</p>`; return; }
+  const scored = d.scores.filter(x=>x.score), avg = scored.length ? scored.reduce((a,x)=>a+x.score,0)/scored.length : 0;
+  $("revGrid").innerHTML = `<div class="pubrow"><span class="label">Overall · <span class="revscore">${avg.toFixed(1)}/10</span></span><div class="val desc">${escHtml(d.overall)}</div></div>`
+    + d.scores.map(x=>{ const label = REVIEW_KEYS.find(k=>k[0]===x.key)?.[1] || x.key;
+      return `<div class="pubrow"><span class="label">${escHtml(label)} · <span class="revscore${x.score && x.score<7?" low":""}">${x.score ?? "–"}/10</span></span><div class="val desc">${x.good?`${escHtml(x.good)}<br>`:""}${x.fix?`<b>À améliorer :</b> ${escHtml(x.fix)}`:""}</div></div>`; }).join("");
+}
+$("revGen").addEventListener("click", ()=>{ if(current.plan && !current.example) makeReview(current); });
+
 
 /* ---------- GoodNovel: genre and tags (lists copied from the GoodNovel app) ---------- */
 const GN_LISTS = {
@@ -1705,12 +1870,14 @@ $("gnGen").addEventListener("click", ()=>{ if(current.plan && !current.example) 
 
 /* ---------- make it mine: import and rewrite in the first person ---------- */
 const NUMWORDS = "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|un|une|deux|trois|quatre|cinq|six|sept|huit|neuf|dix|onze|douze|treize|quatorze|quinze|seize|dix-sept|dix-huit|dix-neuf|vingt|premier|première|1er";
-const HEAD_RE = new RegExp(`^\\s*(?:#{1,3}\\s*)?(?:chapter|chapitre|part|partie)\\s+(\\d+|[ivxlc]+|${NUMWORDS})\\b\\.?\\s*[:.\\-–—]?\\s*(.*)$`, "i");
+const HEAD_RE = new RegExp(`^\\s*(?:#{1,3}\\s*)?(?:chapter|chapitre|capítulo|capitulo|kapitel|capitolo|hoofdstuk|rozdział|rozdzial|глава|bölüm|bolum|sura|bab|part|partie|parte|teil)\\s+(\\d+|[ivxlc]+|${NUMWORDS})\\b\\.?\\s*[:.\\-–—]?\\s*(.*)$`, "i");
+const HEAD_CJK = /^\s*(?:#{1,3}\s*)?(?:第\s*([0-9０-９一二三四五六七八九十百千零〇两]+)\s*[章回話话节節]|제\s*(\d+)\s*장)\s*[:：.\-–—、]?\s*(.*)$/;
+const headMatch = ln => { const m = ln.match(HEAD_RE); if(m) return m; const c = ln.match(HEAD_CJK); return c ? [c[0], c[1]||c[2], c[3]] : null; };
 function splitChapters(raw){
   const lines = raw.replace(/\r\n?/g,"\n").split("\n");
   const chs = []; const pre = []; let cur = null;
   for(const ln of lines){
-    const m = ln.trim().length < 120 ? ln.match(HEAD_RE) : null;
+    const m = ln.trim().length < 120 ? headMatch(ln) : null;
     if(m){ cur = {title:(m[2]||"").replace(/^[#*\s]+|[#*\s]+$/g,"").trim(), lines:[]}; chs.push(cur); }
     else (cur ? cur.lines : pre).push(ln);
   }
@@ -1778,7 +1945,7 @@ $("srcFile").addEventListener("change", async e=>{
 function importMetaPrompt(raw, chs, o){
   const openings = chs.map((c,i)=>`${i+1}. ${c.title?`[heading: ${c.title}] `:""}"${c.text.slice(0,300).replace(/\s+/g," ")}"`).join("\n");
   return `Read the start of this story and reply with only JSON:
-{"language":"English or Français: the language the story is written in",
+{"language":"the language the story is written in, named in English (English, French, Spanish, German, Simplified Chinese…)",
  "title":"${o.title ? `exactly: ${o.title.replace(/"/g,"'")}` : "the story's title if it states one, otherwise a short intriguing title (1 to 5 words, concrete, taken from something in the story, no colon)"}",
  "logline":"one intriguing sentence for the back cover, no spoilers",
  "genre":"one or two words",
@@ -1798,13 +1965,13 @@ STORY START:
 function importPrompt(p, i, k, K, seg){
   const s = p.settings, plan = p.plan, nar = plan.narrator || {}, N = chCount(p);
   const fr = s.lang === "Français";
-  const g = s.gender==="a woman" ? (fr ? " She is a woman: in French, every past participle and adjective about me agrees in the feminine (je suis allée, je me suis sentie seule)." : " The narrator is a woman.")
-          : s.gender==="a man" ? (fr ? " He is a man: masculine agreement in French (je suis allé, je me suis senti seul)." : " The narrator is a man.") : "";
+  const g = genderNote(s, "The narrator is");
   const before = (p.parts[i]?.text || (i>0 ? p.parts[i-1]?.text : "") || "");
   const tail = before ? cleanModelText(before).slice(-3000) : "";
   const others = (plan.characters||[]).filter(c=>c.name && c.name!==nar.name).map(c=>`${c.name}${c.role?` (${c.role})`:""}`).join("; ");
   return `Rewrite this passage so it becomes the narrator's own story, told in the first person by someone who lived it.
-Language of your output: ${s.sameLang ? "the same language as the passage" : s.lang}${!s.sameLang ? " (translate if the passage is in another language)" : ""}.
+Language of your output: ${s.sameLang ? "the same language as the passage" : langName(s)}${!s.sameLang ? " (translate if the passage is in another language)" : ""}.
+${langRules(s)}
 The narrator, "I", is ${nar.name || "the main character"}${nar.role?`, ${nar.role}`:""}.${g}
 Other people: ${others || "as in the text"}.
 Narrative voice: ${plan.voice || "natural, honest, specific"}.
@@ -1840,7 +2007,7 @@ $("fi").addEventListener("submit", async ev=>{
     const m = await sample.json(importMetaPrompt(raw, chs, o), { modelTier:"default", cache:false, signal:ctl.signal });
     if(!m || typeof m !== "object") throw {code:"invalid_json"};
     const str = v => v==null ? "" : String(v);
-    if(!o.lang) p.settings.lang = /fran/i.test(str(m.language)) ? "Français" : "English";
+    if(!o.lang) p.settings.lang = langOf({lang: str(m.language) || "English"}).name;
     p.settings.genre = str(m.genre) || "Literary";
     if(!o.gender){ const gg = str(m.narrator?.gender).toLowerCase(); p.settings.gender = gg.startsWith("w")||gg.startsWith("f") ? "a woman" : gg.startsWith("m")||gg.startsWith("h") ? "a man" : ""; }
     const titles = Array.isArray(m.chapter_titles) ? m.chapter_titles.map(str) : [];
@@ -1986,7 +2153,7 @@ $("f").addEventListener("submit", async ev=>{
     const plan = await sample.json(planPrompt(s), { modelTier:s.tier, cache:false, signal:ctl.signal });
     if(!plan || typeof plan!=="object" || !plan.twist || !Array.isArray(plan.chapters) || !plan.chapters.length) throw {code:"invalid_json"};
     const str = v => v==null ? "" : String(v);
-    plan.chapters = plan.chapters.slice(0, s.chapters).map((c,i)=>({title:str(c?.title)||chapterLabel({settings:s},i), summary:str(c?.summary), goal:str(c?.goal), obstacle:str(c?.obstacle), turn:str(c?.turn), cliffhanger:str(c?.cliffhanger), beats:Array.isArray(c?.beats)?c.beats.map(String):[]}));
+    plan.chapters = plan.chapters.slice(0, s.chapters).map((c,i)=>({title:str(c?.title)||chapterLabel({settings:s},i), summary:str(c?.summary), goal:str(c?.goal), obstacle:str(c?.obstacle), turn:str(c?.turn), emotion:str(c?.emotion), cliffhanger:str(c?.cliffhanger), beats:Array.isArray(c?.beats)?c.beats.map(String):[]}));
     if(!plan.title) plan.title = (plan.title_options||[])[0] || "Untitled";
     p.plan = plan; await storeSave(p);
   } catch(e){ setBusy(false); failed(e); render(EXAMPLE); return; }
@@ -2025,7 +2192,7 @@ $("clean").addEventListener("click", async ()=>{
       const batch = sentences.slice(b,b+40);
       setStatus(`Rewriting flagged sentences ${b+1}–${b+batch.length} of ${sentences.length}`,"busy");
       ctl = new AbortController();
-      const out = await sample.json(`You are a line editor. Each sentence below comes from a story in ${p.settings.lang}. Rewrite each one so it reads like a human novelist wrote it: remove stock phrases (${BANNED_WORDS.slice(0,30).join(", ")}, and similar), replace em dashes with commas, periods or parentheses, and replace any of these names (${BANNED_NAMES.join(", ")}) with a simple, natural name that fits the setting, using the same replacement every time. Keep the meaning, the tense, the voice, and roughly the same length.
+      const out = await sample.json(`You are a line editor. Each sentence below comes from a story in ${langName(p.settings)}. Rewrite each one so it reads like a human novelist wrote it: remove stock phrases (${BANNED_WORDS.slice(0,30).join(", ")}, and similar), replace em dashes with commas, periods or parentheses, and replace any of these names (${BANNED_NAMES.join(", ")}) with a simple, natural name that fits the setting, using the same replacement every time. Keep the meaning, the tense, the voice, and roughly the same length.
 
 Reply with only a JSON array: [{"original":"exact sentence as given","rewrite":"new sentence"}]
 
@@ -2047,9 +2214,9 @@ function coverJpeg(){ try{ return current.cover && !$("coverCv").hidden ? $("cov
 function manuscriptText(p){
   const plan = p.plan||{}, L = [];
   L.push(kindLabel(p).toUpperCase(), "", plan.title||"Untitled", "", plan.logline||"", "", "");
-  if(isMulti(p)){ L.push(fr(p)?"TABLE DES MATIÈRES":"CONTENTS",""); plan.chapters.forEach((c,i)=>L.push(`${chapterLabel(p,i)}: ${c.title}`)); L.push("",""); }
+  if(isMulti(p)){ L.push(langOf(p.settings).contents.toUpperCase(),""); plan.chapters.forEach((c,i)=>L.push(`${chapterLabel(p,i)}: ${c.title}`)); L.push("",""); }
   p.parts.forEach((x,i)=>{ if(!x?.text) return; L.push(chapterLabel(p,i).toUpperCase(), plan.chapters?.[i]?.title||"", ""); L.push(paraList(x.text).join("\n\n"), "", ""); });
-  if(isComplete(p)) L.push(fr(p)?"FIN":"THE END");
+  if(isComplete(p)) L.push(endLabel(p).toUpperCase());
   return L.join("\n");
 }
 // HTML with inline styles that Google Docs, Word, Pages and Notion keep when pasted
@@ -2062,7 +2229,7 @@ function richHtml(p, img){
   out.push(`<h1 style="${F}text-align:center;font-size:30pt;font-weight:bold;margin:0 0 12pt">${escHtml(plan.title||"Untitled")}</h1>`);
   if(plan.logline) out.push(`<p style="${F}text-align:center;font-style:italic;font-size:13pt;color:#555;margin:0 0 24pt">${escHtml(plan.logline)}</p>`);
   if(isMulti(p)){
-    out.push(PB, `<h2 style="${F}text-align:center;font-size:14pt;letter-spacing:2px;margin:24pt 0 12pt">${fr(p)?"TABLE DES MATIÈRES":"CONTENTS"}</h2>`);
+    out.push(PB, `<h2 style="${F}text-align:center;font-size:14pt;letter-spacing:2px;margin:24pt 0 12pt">${escHtml(L(p).contents.toUpperCase())}</h2>`);
     plan.chapters.forEach((c,i)=>out.push(`<p style="${F}font-size:12pt;margin:0 0 6pt">${escHtml(chapterLabel(p,i))} · ${escHtml(c.title)}</p>`));
   }
   p.parts.forEach((x,i)=>{
@@ -2076,7 +2243,7 @@ function richHtml(p, img){
       first = false;
     }
   });
-  if(isComplete(p)) out.push(`<p style="${F}text-align:center;font-size:10pt;letter-spacing:4px;color:#777;margin:36pt 0">${fr(p)?"FIN":"THE END"}</p>`);
+  if(isComplete(p)) out.push(`<p style="${F}text-align:center;font-size:10pt;letter-spacing:4px;color:#777;margin:36pt 0">${escHtml(endLabel(p).toUpperCase())}</p>`);
   return `<div>${out.join("")}</div>`;
 }
 $("copy").addEventListener("click", ()=>{
@@ -2130,7 +2297,7 @@ async function buildDocx(p){
   body.push(para("Kicker", kindLabel(p).toUpperCase(), `<w:spacing w:before="2400"/>`), para("Title", plan.title||"Untitled"));
   if(plan.logline) body.push(para("Subtitle", plan.logline));
   if(isMulti(p)){
-    body.push(pageBreak, para("TOCHeading", fr(p)?"Table des matières":"Contents"));
+    body.push(pageBreak, para("TOCHeading", L(p).contents));
     plan.chapters.forEach((c,i)=>body.push(para("TOCLine", `${chapterLabel(p,i)} · ${c.title}`)));
   }
   p.parts.forEach((x,i)=>{
@@ -2142,12 +2309,12 @@ async function buildDocx(p){
       body.push(para(first?"FirstParagraph":"Normal", t)); first = false;
     }
   });
-  if(isComplete(p)) body.push(para("Kicker", fr(p)?"FIN":"THE END", `<w:spacing w:before="720"/>`));
+  if(isComplete(p)) body.push(para("Kicker", endLabel(p).toUpperCase(), `<w:spacing w:before="720"/>`));
   const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"><w:body>${body.join("")}<w:sectPr><w:pgSz w:w="8640" w:h="12960"/><w:pgMar w:top="1080" w:right="1008" w:bottom="1080" w:left="1152" w:header="576" w:footer="576" w:gutter="0"/></w:sectPr></w:body></w:document>`;
   const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia" w:cs="Georgia" w:eastAsia="Georgia"/><w:sz w:val="23"/><w:lang w:val="${fr(p)?"fr-FR":"en-GB"}"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="324" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
+<w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Georgia" w:hAnsi="Georgia" w:cs="Georgia" w:eastAsia="Georgia"/><w:sz w:val="23"/><w:lang w:val="${L(p).code}" w:eastAsia="${L(p).code}"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="324" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
 <w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:firstLine="360"/><w:jc w:val="both"/></w:pPr></w:style>
 <w:style w:type="paragraph" w:styleId="FirstParagraph"><w:name w:val="First Paragraph"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:ind w:firstLine="0"/></w:pPr></w:style>
 <w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:qFormat/><w:pPr><w:jc w:val="center"/><w:ind w:firstLine="0"/><w:spacing w:before="120" w:after="240" w:line="240" w:lineRule="auto"/></w:pPr><w:rPr><w:b/><w:sz w:val="60"/></w:rPr></w:style>
@@ -2170,7 +2337,7 @@ async function buildDocx(p){
   return zip(files);
 }
 function manuscriptHtml(p){
-  return `<!doctype html><html lang="${fr(p)?"fr":"en"}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(p.plan?.title||"Untitled")}</title>
+  return `<!doctype html><html lang="${L(p).code.slice(0,2)}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escHtml(p.plan?.title||"Untitled")}</title>
 <style>body{margin:0;background:#fbfaf7;color:#1c1c1a;padding:40px 20px}main{max-width:34em;margin:0 auto}img{max-width:100%;height:auto}</style></head><body><main>${richHtml(p, coverJpeg())}</main></body></html>`;
 }
 $("dlDocx").addEventListener("click", async ()=>{
