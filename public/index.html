@@ -1415,7 +1415,7 @@ $("ideas").addEventListener("click", e=>{
 });
 
 /* ---------- prompts ---------- */
-function planPrompt(s){
+function planPrompt(s, brief){
   const per = Math.round(s.words/s.chapters), segs = Math.max(1, Math.ceil(per/SEG_WORDS));
   const beatsN = Math.min(12, Math.max(3, segs*3));
   const kind = s.format==="book" ? "a novel" : "a story";
@@ -1477,7 +1477,7 @@ Reply with only JSON in this shape:
  "twist": {"reveal":"what is actually true","why_it_works":"how it reframes earlier scenes"},
  "clues": [{"where":"chapter number and scene","what":"","how_misread":""}],
  "twist_chapter": number,
- "chapters": [{"title":"short chapter title","summary":"2 to 3 sentences of what happens","goal":"what the point-of-view character wants in this chapter","obstacle":"who or what is in the way","turn":"what changes for good","emotion":"what the narrator feels in this chapter and how it shows","cliffhanger":"the exact moment the chapter cuts off on (empty for the last chapter)","beats":["${beatsN} concrete scene beats in order"]}]
+ "chapters": [${brief ? `{"title":"short chapter title","summary":"one sentence of what happens","cliffhanger":"what it cuts off on, in a few words (empty for the last chapter)"}` : `{"title":"short chapter title","summary":"2 to 3 sentences of what happens","goal":"what the point-of-view character wants in this chapter","obstacle":"who or what is in the way","turn":"what changes for good","emotion":"what the narrator feels in this chapter and how it shows","cliffhanger":"the exact moment the chapter cuts off on (empty for the last chapter)","beats":["${beatsN} concrete scene beats in order"]}`}]
 }
 "chapters" must contain exactly ${s.chapters} item${s.chapters>1?"s":""}, every one with a title.`;
 }
@@ -1538,6 +1538,53 @@ ${voiceRules(s)}
 ${STYLE_RULES}
 
 Output only the prose, paragraphs separated by blank lines. No chapter number or title, no headings, no markdown, no notes before or after.`;
+}
+
+/* Long books are planned in two steps (a short outline, then chapters in batches of PLAN_BATCH),
+   so no single answer grows long enough to be cut off. */
+const PLAN_BATCH = 10;
+function planDetailPrompt(s, plan, from, to){
+  const per = Math.round(s.words/s.chapters), beatsN = Math.min(12, Math.max(3, Math.ceil(per/SEG_WORDS)*3));
+  const bible = {...plan, chapters: undefined, title_options: undefined};
+  const outline = plan.chapters.map((c,j)=>`${j+1}. ${c?.title||""}: ${c?.summary||""}${c?.cliffhanger?` (ends on: ${c.cliffhanger})`:""}`).join("\n");
+  return `You are detailing the chapter plan of ${s.format==="book"?"a novel":"a story"} called "${plan.title}". Language of every field: ${langName(s)}.
+
+STORY BIBLE:
+${JSON.stringify(bible)}
+
+FULL OUTLINE (${s.chapters} chapters):
+${outline}
+
+Detail chapters ${from+1} to ${to} only. Keep each chapter's title and events from the outline. Every chapter has a goal, an obstacle and a turn that changes something for good; every chapter except the last one of the book ends on a heavy cliffhanger that the next chapter picks up.
+
+${CRAFT_RULES}
+
+${paceRules(s)}
+
+Reply with only JSON:
+{"chapters":[{"title":"short chapter title","summary":"2 to 3 sentences of what happens","goal":"what the narrator wants in this chapter","obstacle":"who or what is in the way","turn":"what changes for good","emotion":"what the narrator feels and how it shows","cliffhanger":"the exact moment the chapter cuts off on","beats":["${beatsN} concrete scene beats in order"]}]}
+"chapters" must contain exactly ${to-from} item${to-from>1?"s":""}, chapters ${from+1} to ${to} in order.`;
+}
+// a cut-off or garbled JSON answer gets one more try before the writer sees an error
+async function jsonTry(prompt, opts){
+  try{ return await sample.json(prompt, opts); }
+  catch(e){ if(e?.code!=="invalid_json" || opts.signal?.aborted) throw e; return await sample.json(prompt, opts); }
+}
+async function buildPlan(s, signal){
+  const opts = { modelTier:s.tier, cache:false, signal }, brief = s.chapters > PLAN_BATCH;
+  const plan = await jsonTry(planPrompt(s, brief), opts);
+  if(!plan || typeof plan!=="object" || !plan.twist || !Array.isArray(plan.chapters) || !plan.chapters.length) throw {code:"invalid_json"};
+  if(!brief) return plan;
+  plan.chapters = plan.chapters.slice(0, s.chapters);
+  while(plan.chapters.length < s.chapters) plan.chapters.push({title:"", summary:""});
+  for(let a = 0; a < s.chapters; a += PLAN_BATCH){
+    const b = Math.min(s.chapters, a + PLAN_BATCH);
+    setStatus(`Planning chapters ${a+1} to ${b} of ${s.chapters}`,"busy");
+    const r = await jsonTry(planDetailPrompt(s, plan, a, b), opts);
+    const list = Array.isArray(r?.chapters) ? r.chapters : Array.isArray(r) ? r : [];
+    list.slice(0, b-a).forEach((c,k)=>{ if(c && typeof c==="object") plan.chapters[a+k] = {...plan.chapters[a+k], ...c}; });
+  }
+  return plan;
 }
 
 /* ---------- publishing details (NovelSnack form) ---------- */
@@ -2152,8 +2199,7 @@ $("f").addEventListener("submit", async ev=>{
   setStatus("Planning the hook, characters, chapters and twist","busy"); setProgress(0);
   ctl = new AbortController();
   try{
-    const plan = await sample.json(planPrompt(s), { modelTier:s.tier, cache:false, signal:ctl.signal });
-    if(!plan || typeof plan!=="object" || !plan.twist || !Array.isArray(plan.chapters) || !plan.chapters.length) throw {code:"invalid_json"};
+    const plan = await buildPlan(s, ctl.signal);
     const str = v => v==null ? "" : String(v);
     plan.chapters = plan.chapters.slice(0, s.chapters).map((c,i)=>({title:str(c?.title)||chapterLabel({settings:s},i), summary:str(c?.summary), goal:str(c?.goal), obstacle:str(c?.obstacle), turn:str(c?.turn), emotion:str(c?.emotion), cliffhanger:str(c?.cliffhanger), beats:Array.isArray(c?.beats)?c.beats.map(String):[]}));
     if(!plan.title) plan.title = (plan.title_options||[])[0] || "Untitled";
